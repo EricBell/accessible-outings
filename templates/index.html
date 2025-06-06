@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Home - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 mb-4">Find Accessible Indoor Activities</h1>
+            <p class="lead mb-4">
+                Discover wheelchair-friendly museums, aquariums, gardens, and more in your area. 
+                Perfect for rainy days or when you need accessible indoor entertainment.
+            </p>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <div class="card shadow">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-4">
+                        <i class="fas fa-search me-2"></i>Search for Venues
+                    </h3>
+                    
+                    <form action="{{ url_for('main.search') }}" method="GET" id="searchForm">
+                        <div class="row g-3">
+                            <!-- ZIP Code -->
+                            <div class="col-md-6">
+                                <label for="zip_code" class="form-label">ZIP Code *</label>
+                                <input type="text" 
+                                       class="form-control form-control-lg" 
+                                       id="zip_code" 
+                                       name="zip_code" 
+                                       value="{{ default_zip or '' }}"
+                                       placeholder="Enter ZIP code"
+                                       pattern="[0-9]{5}(-[0-9]{4})?"
+                                       required>
+                                <div class="form-text">Enter your ZIP code to find nearby venues</div>
+                            </div>
+                            
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <label for="category_id" class="form-label">Category</label>
+                                <select class="form-select form-select-lg" id="category_id" name="category_id">
+                                    <option value="">All Categories</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">
+                                        {{ category.name }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <div class="form-text">Filter by venue type</div>
+                            </div>
+                            
+                            <!-- Radius -->
+                            <div class="col-md-6">
+                                <label for="radius" class="form-label">Search Radius</label>
+                                <select class="form-select" id="radius" name="radius">
+                                    <option value="10">10 miles</option>
+                                    <option value="20">20 miles</option>
+                                    <option value="30" selected>30 miles</option>
+                                    <option value="45">45 miles</option>
+                                    <option value="60">60 miles</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Accessibility Filter -->
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" 
+                                           type="checkbox" 
+                                           id="accessible_only" 
+                                           name="accessible_only" 
+                                           value="true">
+                                    <label class="form-check-label" for="accessible_only">
+                                        <i class="fas fa-wheelchair me-1"></i>
+                                        Wheelchair accessible only
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Search Button -->
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">
+                                    <i class="fas fa-search me-2"></i>Find Accessible Venues
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Searches -->
+    {% if recent_searches %}
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <h4 class="mb-3">
+                <i class="fas fa-history me-2"></i>Recent Searches
+            </h4>
+            <div class="d-flex flex-wrap gap-2">
+                {% for search in recent_searches %}
+                <a href="{{ url_for('main.search', 
+                                  zip_code=search.search_zip,
+                                  category_id=search.category_filter,
+                                  radius=search.search_radius,
+                                  accessible_only=search.accessibility_filter) }}" 
+                   class="btn btn-outline-secondary btn-sm">
+                    {{ search.search_zip }}
+                    {% if search.category %}
+                        - {{ search.category.name }}
+                    {% endif %}
+                    {% if search.accessibility_filter %}
+                        <i class="fas fa-wheelchair ms-1"></i>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Featured Categories -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">
+                <i class="fas fa-th-large me-2"></i>Browse by Category
+            </h3>
+            <div class="row g-4">
+                {% for category in categories[:6] %}
+                <div class="col-md-4 col-lg-2">
+                    <a href="{{ url_for('main.category_venues', category_id=category.id) }}" 
+                       class="text-decoration-none">
+                        <div class="card h-100 text-center category-card">
+                            <div class="card-body">
+                                <i class="{{ category.icon_class or 'fas fa-building' }} fa-2x text-primary mb-3"></i>
+                                <h6 class="card-title">{{ category.name }}</h6>
+                                <small class="text-muted">
+                                    {{ category.get_venues_count() }} venues
+                                </small>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if categories|length > 6 %}
+            <div class="text-center mt-4">
+                <a href="{{ url_for('main.categories') }}" class="btn btn-outline-primary">
+                    View All Categories
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row">
+        <div class="col-12">
+            <h3 class="text-center mb-4">Why Choose {{ app_name }}?</h3>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="fas fa-wheelchair fa-3x text-primary mb-3"></i>
+                        <h5>Accessibility First</h5>
+                        <p class="text-muted">
+                            Every venue is evaluated for wheelchair accessibility, 
+                            with detailed information about ramps, elevators, and accessible facilities.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="fas fa-users fa-3x text-primary mb-3"></i>
+                        <h5>Community Reviews</h5>
+                        <p class="text-muted">
+                            Real reviews from people who understand accessibility needs, 
+                            helping you make informed decisions about where to visit.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <i class="fas fa-heart fa-3x text-primary mb-3"></i>
+                        <h5>Save Favorites</h5>
+                        <p class="text-muted">
+                            Keep track of venues you love and want to visit again, 
+                            with personal notes and accessibility ratings.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-focus ZIP code input
+    const zipInput = document.getElementById('zip_code');
+    if (zipInput && !zipInput.value) {
+        zipInput.focus();
+    }
+    
+    // ZIP code validation
+    zipInput.addEventListener('input', function() {
+        const value = this.value.replace(/\D/g, ''); // Remove non-digits
+        if (value.length <= 5) {
+            this.value = value;
+        } else if (value.length <= 9) {
+            this.value = value.slice(0, 5) + '-' + value.slice(5);
+        }
+    });
+    
+    // Form validation
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        const zipCode = zipInput.value.trim();
+        if (!zipCode) {
+            e.preventDefault();
+            zipInput.focus();
+            alert('Please enter a ZIP code to search.');
+            return false;
+        }
+        
+        // Basic ZIP code format validation
+        const zipPattern = /^\d{5}(-\d{4})?$/;
+        if (!zipPattern.test(zipCode)) {
+            e.preventDefault();
+            zipInput.focus();
+            alert('Please enter a valid ZIP code (e.g., 12345 or 12345-6789).');
+            return false;
+        }
+    });
+});
+</script>
+{% endblock %}
