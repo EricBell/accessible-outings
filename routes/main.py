@@ -83,8 +83,11 @@ def search():
         # Get category info
         category = VenueCategory.query.get(category_id) if category_id else None
         
-        # Get location display name
-        location_name = current_app.location_service.get_location_display_name(latitude, longitude)
+        # Get location display name (fallback to ZIP code if API fails)
+        try:
+            location_name = current_app.location_service.get_location_display_name(latitude, longitude)
+        except:
+            location_name = f"ZIP {zip_code}"
         
         return render_template('search_results.html',
                              venues=venues,
@@ -102,7 +105,11 @@ def search():
         
     except Exception as e:
         current_app.logger.error(f"Search error: {e}")
-        flash('Search failed. Please try again.', 'error')
+        # Check if it's a Google API issue
+        if "REQUEST_DENIED" in str(e):
+            flash('Google Places API is not available. Please check your API key configuration.', 'warning')
+        else:
+            flash('Search failed. Please try again.', 'error')
         return redirect(url_for('main.index'))
 
 @main_bp.route('/venue/<int:venue_id>')

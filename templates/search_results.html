@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Search Results - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Search Results Header -->
+    <div class="search-results-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-2">
+                    <i class="fas fa-search me-2"></i>Search Results
+                </h2>
+                <p class="mb-0">
+                    Found <strong>{{ total_results }}</strong> venues
+                    {% if category %}for <strong>{{ category.name }}</strong>{% endif %}
+                    {% if location_name %}near <strong>{{ location_name }}</strong>{% endif %}
+                    within {{ search_params.radius }} miles
+                    {% if search_params.accessible_only %}
+                    <span class="badge bg-success ms-2">
+                        <i class="fas fa-wheelchair me-1"></i>Wheelchair Accessible Only
+                    </span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{{ url_for('main.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-search me-2"></i>New Search
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if venues %}
+    <!-- Search Results -->
+    <div class="row g-4">
+        {% for venue in venues %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 venue-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ venue.name }}</h5>
+                        {% if current_user.is_authenticated or bypass_auth %}
+                        <button class="favorite-btn" 
+                                data-venue-id="{{ venue.id }}"
+                                aria-label="Add to favorites">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="card-text text-muted small mb-2">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        {{ venue.address }}
+                        {% if venue.city %}, {{ venue.city }}{% endif %}
+                    </p>
+                    
+                    {% if search_params.latitude and search_params.longitude %}
+                    <p class="card-text small mb-2">
+                        <span class="distance-badge">
+                            <i class="fas fa-route me-1"></i>
+                            {{ venue|distance(search_params.latitude, search_params.longitude) }}
+                        </span>
+                    </p>
+                    {% endif %}
+                    
+                    <!-- Accessibility Score -->
+                    {% set score = venue|accessibility_score %}
+                    <div class="mb-2">
+                        {% if score >= 80 %}
+                        <span class="accessibility-score accessibility-excellent">
+                            <i class="fas fa-wheelchair me-1"></i>Excellent ({{ score }}%)
+                        </span>
+                        {% elif score >= 60 %}
+                        <span class="accessibility-score accessibility-good">
+                            <i class="fas fa-wheelchair me-1"></i>Good ({{ score }}%)
+                        </span>
+                        {% elif score >= 40 %}
+                        <span class="accessibility-score accessibility-fair">
+                            <i class="fas fa-wheelchair me-1"></i>Fair ({{ score }}%)
+                        </span>
+                        {% else %}
+                        <span class="accessibility-score accessibility-limited">
+                            <i class="fas fa-wheelchair me-1"></i>Limited ({{ score }}%)
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Accessibility Features -->
+                    {% if venue.accessibility_features_list %}
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            {% for feature in venue.accessibility_features_list[:3] %}
+                            <i class="fas fa-check text-success me-1"></i>{{ feature }}
+                            {% if not loop.last %}<br>{% endif %}
+                            {% endfor %}
+                            {% if venue.accessibility_features_list|length > 3 %}
+                            <br><em>+{{ venue.accessibility_features_list|length - 3 }} more features</em>
+                            {% endif %}
+                        </small>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Rating -->
+                    {% if venue.google_rating %}
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <span class="rating-stars">
+                                {% for i in range(1, 6) %}
+                                    {% if i <= venue.google_rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            {{ venue.google_rating }}/5
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('main.venue_detail', venue_id=venue.id) }}" 
+                       class="btn btn-primary w-100">
+                        <i class="fas fa-info-circle me-2"></i>View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <!-- No Results -->
+    <div class="row">
+        <div class="col-12">
+            <div class="error-state">
+                <i class="fas fa-search"></i>
+                <h3>No venues found</h3>
+                <p class="text-muted">
+                    Try expanding your search radius or removing filters.
+                    {% if search_params.accessible_only %}
+                    <br>You can also try searching without the wheelchair accessible filter.
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                    <i class="fas fa-search me-2"></i>Try a New Search
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize favorite buttons if they exist
+    if (typeof AccessibleOutings !== 'undefined') {
+        AccessibleOutings.favorites.initButtons();
+    }
+});
+</script>
+{% endblock %}

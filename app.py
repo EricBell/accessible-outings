@@ -146,7 +146,7 @@ def create_app(config_class=None):
         if app.config.get('BYPASS_AUTH') and not current_user.is_authenticated:
             # Get default user for bypass mode
             from models.user import User
-            default_user = User.query.get(app.config.get('DEFAULT_USER_ID', 1))
+            default_user = db.session.get(User, app.config.get('DEFAULT_USER_ID', 1))
             return {'current_user': default_user}
         return {}
     
