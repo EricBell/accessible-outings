@@ -9,7 +9,8 @@ class VenueCategory(db.Model):
     __tablename__ = 'venue_categories'
     
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    # name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(128), unique=True, nullable=False)  # Add unique=True
     description = db.Column(db.Text)
     icon_class = db.Column(db.String(50))  # CSS class for icons
     search_keywords = db.Column(DatabaseCompatArray())  # Keywords for API searches

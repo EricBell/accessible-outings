@@ -1,73 +1,103 @@
 import unittest
-from app import app, db, Todo 
+from app import app, db
+from models.venue import VenueCategory
+from models.user import User
 
-class TodoTestCase(unittest.TestCase):
-
+class AppTestCase(unittest.TestCase):
     def setUp(self):
-        # Configure the app for testing
         app.config['TESTING'] = True
-        # Use an in-memory SQLite database for tests
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        # Create the test client
         self.app = app.test_client()
-        # Push the application context and create all tables
         self.ctx = app.app_context()
         self.ctx.push()
         db.create_all()
 
     def tearDown(self):
-        # Cleanup the database and remove the app context
         db.session.remove()
         db.drop_all()
         self.ctx.pop()
 
-    def test_home(self):
-        # Test that the home route ("/") returns a 200 OK status code.
+    def test_home_route(self):
+        """Test that the home route returns 200 OK."""
         response = self.app.get("/")
         self.assertEqual(response.status_code, 200)
-        # Optionally, check for expected content in the rendered template.
-        self.assertIn(b"Todo", response.data)
 
-    def test_add_todo(self):
-        # Test posting a new todo item using the "/add" route.
-        response = self.app.post("/add", data={"title": "Test Todo"}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        # Verify that the new todo has been added to the database.
-        todo = Todo.query.filter_by(title="Test Todo").first()
-        self.assertIsNotNone(todo)
-        self.assertFalse(todo.complete)
+    def test_categories_initialized(self):
+        """Test that categories are initialized in the database."""
+        from app import _initialize_database
+        _initialize_database(app)
+        categories = VenueCategory.query.all()
+        self.assertGreaterEqual(len(categories), 1)
+        names = [cat.name for cat in categories]
+        self.assertIn("Museums", names)
 
-    def test_update_todo(self):
-        # Manually add a todo item to update.
-        todo = Todo(title="Update Test", complete=False)
-        db.session.add(todo)
+    def test_add_new_category(self):
+        """Test adding a new category to the database."""
+        new_cat = VenueCategory(
+            name="Test Category",
+            description="A test category",
+            icon_class="fas fa-star",
+            search_keywords=["test", "category"]
+        )
+        db.session.add(new_cat)
         db.session.commit()
-        todo_id = todo.id
+        found = VenueCategory.query.filter_by(name="Test Category").first()
+        self.assertIsNotNone(found)
+        self.assertEqual(found.icon_class, "fas fa-star")
 
-        # Toggle its 'complete' value by accessing the update route.
-        response = self.app.get(f"/update/{todo_id}", follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        # Use Session.get() instead of Query.get()
-        updated_todo = db.session.get(Todo, todo_id)
-        self.assertTrue(updated_todo.complete)
-
-    def test_delete_todo(self):
-        # Manually add a todo item to delete.
-        todo = Todo(title="Delete Test", complete=False)
-        db.session.add(todo)
+    def test_create_user(self):
+        """Test creating a new user."""
+        user = User.create_user(
+            username="unittestuser",
+            email="unittest@example.com",
+            password="testpass",
+            first_name="Unit",
+            last_name="Test",
+            home_zip_code="12345"
+        )
+        db.session.add(user)
         db.session.commit()
-        todo_id = todo.id
+        found = User.query.filter_by(username="unittestuser").first()
+        self.assertIsNotNone(found)
+        self.assertEqual(found.email, "unittest@example.com")
 
-        # Delete the todo using the delete route.
-        response = self.app.get(f"/delete/{todo_id}", follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        # Use Session.get() instead of Query.get()
-        deleted_todo = db.session.get(Todo, todo_id)
-        self.assertIsNone(deleted_todo)
+    # Negative tests
 
-    # def test_failure(self):
-    #     # Simulate a failure case
-    #     self.assertFalse(True, "This test should fail.")
+    def test_category_not_found(self):
+        """Test that querying a non-existent category returns None."""
+        found = VenueCategory.query.filter_by(name="NonExistentCategory").first()
+        self.assertIsNone(found)
+
+    def test_user_not_found(self):
+        """Test that querying a non-existent user returns None."""
+        found = User.query.filter_by(username="no_such_user").first()
+        self.assertIsNone(found)
+
+    def test_home_route_not_found(self):
+        """Test that a non-existent route returns 404."""
+        response = self.app.get("/thispagedoesnotexist")
+        self.assertEqual(response.status_code, 404)
+
+    def test_duplicate_category(self):
+        """Test that adding duplicate category names is not allowed if unique constraint exists."""
+        new_cat1 = VenueCategory(
+            name="Duplicate Category",
+            description="First instance",
+            icon_class="fas fa-star",
+            search_keywords=["dup"]
+        )
+        db.session.add(new_cat1)
+        db.session.commit()
+        new_cat2 = VenueCategory(
+            name="Duplicate Category",
+            description="Second instance",
+            icon_class="fas fa-star",
+            search_keywords=["dup"]
+        )
+        db.session.add(new_cat2)
+        with self.assertRaises(Exception):
+            db.session.commit()
+        db.session.rollback()
 
 if __name__ == "__main__":
     unittest.main()
