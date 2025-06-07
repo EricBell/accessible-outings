@@ -330,3 +330,36 @@ class LocationService:
                 return state
         
         return f"{latitude:.4f}, {longitude:.4f}"
+    
+
+def main():
+    """Validate the api key can be retrieved."""
+    from dotenv import load_dotenv
+    load_dotenv()
+    import os
+    google_api_key = os.environ.get('GOOGLE_PLACES_API_KEY')
+    print("google api key ", google_api_key)
+    geocoding_service = GeocodingService(google_api_key=google_api_key)
+    print("geo svc", geocoding_service)
+
+# import unittest
+# from unittest.mock import patch
+# import os
+# from utils import geocoding   
+# class TestGeocodingMain(unittest.TestCase):
+ 
+
+#     @patch.dict(os.environ, {"GOOGLE_PLACES_API_KEY": "testkey"})
+#     def test_main(self):
+#         # Optionally, patch print to capture output
+#         with patch("builtins.print") as mock_print:
+#             geocoding.main()
+#             # Check that the API key was printed
+#             mock_print.assert_any_call("google api key  testkey")
+#             # Check that the GeocodingService object was printed
+#             self.assertTrue(any("geo svc" in str(call) for call in mock_print.call_args_list))
+
+if __name__ == "__main__":
+    main()
+    
+ 

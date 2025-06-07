@@ -87,7 +87,7 @@ Edit `.env` with your settings:
 DATABASE_URL=postgresql://accessible_user:your_password@your-nas-ip:5432/accessible_outings
 
 # API Keys
-GOOGLE_PLACES_API_KEY=your_google_places_api_key_here
+GOOGLE_PLACES_API_KEY="DELETETHIS-ITSATEST"your_google_places_api_key_here
 
 # Flask Configuration
 SECRET_KEY=your_very_secret_key_here
