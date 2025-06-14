@@ -28,3 +28,36 @@ This file maintains new feature ideas and optimizations.
 
 Run the missing template test only
   ./run_tests.sh VenueDetailTestCase.test_venue_detail_template_missing_error
+
+Reset to starting condictions
+  rm -f instance/accessible_outings.db
+  chmod +x reset_and_start.sh      
+  
+● Usage Instructions
+
+  For You (Testing)
+
+  # Quick reset and restart
+  ./reset_and_start.sh
+
+  For Others (Starting from Scratch)
+
+  1. Clone/download the project
+  2. Run: ./reset_and_start.sh
+  3. Visit: http://127.0.0.1:5000
+  4. Test the venue detail issue by searching and clicking "View Details"
+
+  Manual Reset (if needed)
+
+  rm -f instance/accessible_outings.db
+  python app.py
+
+  What's Reset
+
+  - ✅ Database completely removed and recreated
+  - ✅ All tables created fresh (including api_cache)
+  - ✅ Sample venues and categories initialized
+  - ✅ Clean Python cache
+  - ✅ Ready for testing the venue detail template issue
+
+  The app will start fresh every time, and others can easily reproduce the missing template issue to test their fixes!
