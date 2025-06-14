@@ -1,0 +1,27 @@
+This file maintains new feature ideas and optimizations.
+
+  Suggested Feature: AccessibleRouteOptimizer
+
+  Purpose: Help users plan efficient routes visiting multiple wheelchair-accessible venues, considering real accessibility constraints like parking availability
+  and terrain difficulty.
+
+  Key Methods:
+  def optimize_venue_route(self, start_zip: str, venue_list: List[str], max_radius: int = 30) -> Dict
+  def calculate_accessibility_travel_time(self, from_coords: Tuple, to_coords: Tuple) -> float
+  def find_accessible_parking_nearby(self, venue_coords: Tuple, radius: float = 0.5) -> List[Dict]
+
+  Why This Feature:
+  1. Highly Testable - Pure algorithmic functions with clear inputs/outputs
+  2. Real User Value - Solves the complex problem of planning accessible day trips
+  3. Leverages Existing Code - Uses current distance calculations and geocoding
+  4. Data-Driven - Can incorporate venue accessibility ratings from your review system
+
+  Test Scenarios:
+  - Route optimization with different venue combinations
+  - Edge cases (unreachable venues, single venue)
+  - Performance with large venue lists
+  - Accessibility constraint validation
+
+  This feature would integrate seamlessly with your existing calculate_distance() and venue search functionality while providing substantial new value for users
+  planning accessible outings.
+  
