@@ -25,3 +25,6 @@ This file maintains new feature ideas and optimizations.
   This feature would integrate seamlessly with your existing calculate_distance() and venue search functionality while providing substantial new value for users
   planning accessible outings.
   
+
+Run the missing template test only
+  ./run_tests.sh VenueDetailTestCase.test_venue_detail_template_missing_error
