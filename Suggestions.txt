@@ -61,3 +61,152 @@ Reset to starting condictions
   - ✅ Ready for testing the venue detail template issue
 
   The app will start fresh every time, and others can easily reproduce the missing template issue to test their fixes!
+
+-------------
+
+ Design Philosophy
+
+  This is an accessibility-focused app helping users find wheelchair-accessible venues. The venue detail page should be the most comprehensive and accessible part
+  of the user experience.
+
+  Page Structure Plan
+
+  1. Hero Section
+
+  - Large venue name as main heading
+  - Accessibility status badge (prominent green/red indicator)
+  - Quick contact info (phone, website)
+  - "Back to Search" breadcrumb
+
+  2. Essential Information Block
+
+  - Address with map integration (if possible)
+  - Operating hours (today highlighted, full week available)
+  - Contact details (phone clickable, website link)
+  - Category (Museums, Shopping Centers, etc.)
+
+  3. Accessibility Features Section ⭐ CORE FEATURE
+
+  Visual grid/checklist showing:
+  - ✅ Wheelchair accessible entrance
+  - ✅ Accessible parking available
+  - ✅ Accessible restrooms
+  - ✅ Elevator access
+  - ✅ Wide doorways
+  - ❌ No braille menu
+  - ❌ No hearing loop
+
+  4. User Interaction Section
+
+  - "Add to Favorites" button (if user logged in)
+  - "Write a Review" button
+  - "Report Accessibility Issue" link
+
+  5. Reviews & Ratings
+
+  - Overall rating (1-5 stars)
+  - Accessibility rating (separate from overall)
+  - Recent user reviews with accessibility focus
+  - "Helpful for accessibility" votes
+
+  6. Similar Venues Recommendations
+
+  - "Other accessible venues nearby"
+  - Same category accessible options
+
+  Accessibility-First UI Behaviors
+
+  Visual Design
+
+  - High contrast colors for accessibility ratings
+  - Large, clear fonts for readability
+  - Color + icons (not just color) for status indicators
+  - Screen reader friendly with proper ARIA labels
+
+  Interactive Elements
+
+  - Keyboard navigation support
+  - Click targets 44px minimum for motor accessibility
+  - Focus indicators clearly visible
+  - Error states clearly communicated
+
+  Data Display Strategy
+
+  ✅ Wheelchair Accessible    🅿️ Accessible Parking    🚻 Accessible Restrooms
+  🛗 Elevator Access         📝 Large Print Menu      🔇 Quiet Environment
+  ❌ No Braille Menu         ❌ No Hearing Loop       ⭐ Service Animal Friendly
+
+  Responsive Behavior
+
+  Mobile (Primary Focus)
+
+  - Single column layout
+  - Collapsible sections (hours, full accessibility list)
+  - Sticky "Call" button for easy contact
+  - Swipe-friendly image gallery (if photos available)
+
+  Desktop
+
+  - Two-column layout: Info left, accessibility features right
+  - Expandable map view
+  - Hover states for interactive elements
+
+  Smart Features
+
+  Contextual Information
+
+  - "Currently Open/Closed" status
+  - Distance from user's search location
+  - "Last updated" info for accessibility data
+  - Weather considerations (indoor/outdoor venue hints)
+
+  User-Specific Features
+
+  - Remember user's accessibility needs (if logged in)
+  - Highlight relevant features based on user profile
+  - Personal accessibility notes section
+
+  Technical Behavior
+
+  Data Validation
+
+  - Graceful handling of missing venue data
+  - Default values for empty accessibility fields
+  - Progressive enhancement (works without JavaScript)
+
+  Performance
+
+  - Lazy load non-critical sections
+  - Optimize images for fast mobile loading
+  - Cache accessibility status for offline viewing
+
+  Error States & Edge Cases
+
+  Missing Data Handling
+
+  - "Information not available" instead of empty sections
+  - "Help us improve" calls-to-action for missing accessibility info
+  - Contact venue directly fallback options
+
+  User States
+
+  - Not logged in: Show simplified interaction options
+  - Logged in: Full favorites, reviews, personalization
+  - Mobile vs desktop: Appropriate interaction patterns
+
+  Content Priority (Top to Bottom)
+
+  1. Venue name + accessibility status (immediate need)
+  2. Address + hours (planning need)
+  3. Accessibility details (decision-making need)
+  4. User actions (engagement need)
+  5. Reviews (validation need)
+  6. Recommendations (discovery need)
+
+  Key Success Metrics
+
+  - Users can quickly determine accessibility within 3 seconds
+  - Contact information is immediately actionable
+  - Accessibility features are scannable at a glance
+  - Page works perfectly with screen readers
+  - Mobile-first experience is smooth and fast

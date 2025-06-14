@@ -18,4 +18,4 @@ case "$1" in
     ;;
 esac
 
-zip -r "$ZIPFILE" . -x "env/*" "env" ".git/*" ".git" "*/__pycache__/*" "__pycache__" "zip-it.sh" ".env"
+zip -r "$ZIPFILE" . -x ".venv/*" ".venv" ".git/*" ".git" "*/__pycache__/*" "__pycache__" "zip-it.sh" ".env" "Suggestions.txt" "simple_unit_test.py"
