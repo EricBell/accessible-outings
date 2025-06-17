@@ -1,0 +1,483 @@
+{% extends "base.html" %}
+
+{% block title %}{{ venue.name }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Venue Header -->
+    <div class="venue-header mb-4">
+        <div class="row align-items-start">
+            <div class="col-md-8">
+                <h1 class="mb-2">{{ venue.name }}</h1>
+                <p class="text-muted mb-2">
+                    <i class="fas fa-map-marker-alt me-2"></i>
+                    {{ venue.address }}
+                    {% if venue.city %}, {{ venue.city }}{% endif %}
+                </p>
+                
+                <!-- Rating and basic info -->
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    {% if venue.google_rating %}
+                    <div class="rating-display">
+                        <span class="rating-stars">
+                            {% for i in range(1, 6) %}
+                                {% if i <= venue.google_rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-warning"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <span class="ms-1">{{ venue.google_rating }}/5</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if venue.phone %}
+                    <div class="phone-display">
+                        <i class="fas fa-phone me-1"></i>
+                        <a href="tel:{{ venue.phone }}">{{ venue.phone }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-4 text-md-end">
+                {% if current_user.is_authenticated or bypass_auth %}
+                <button class="btn btn-outline-danger favorite-btn mb-2" 
+                        data-venue-id="{{ venue.id }}"
+                        {% if is_favorited %}data-favorited="true"{% endif %}>
+                    <i class="{% if is_favorited %}fas{% else %}far{% endif %} fa-heart me-2"></i>
+                    {% if is_favorited %}Remove from Favorites{% else %}Add to Favorites{% endif %}
+                </button>
+                {% endif %}
+                
+                {% if venue.website %}
+                <a href="{{ venue.website }}" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt me-2"></i>Visit Website
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- Accessibility Score -->
+            {% set score = venue|accessibility_score %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-wheelchair me-2"></i>Accessibility Score
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="accessibility-score-large mb-3">
+                        {% if score >= 80 %}
+                        <div class="score-circle excellent">
+                            <span class="score-number">{{ score }}%</span>
+                            <span class="score-label">Excellent</span>
+                        </div>
+                        {% elif score >= 60 %}
+                        <div class="score-circle good">
+                            <span class="score-number">{{ score }}%</span>
+                            <span class="score-label">Good</span>
+                        </div>
+                        {% elif score >= 40 %}
+                        <div class="score-circle fair">
+                            <span class="score-number">{{ score }}%</span>
+                            <span class="score-label">Fair</span>
+                        </div>
+                        {% else %}
+                        <div class="score-circle limited">
+                            <span class="score-number">{{ score }}%</span>
+                            <span class="score-label">Limited</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if accessibility_summary %}
+                    <div class="accessibility-summary">
+                        <h5>Accessibility Features</h5>
+                        <div class="row">
+                            {% for category, features in accessibility_summary.items() %}
+                            <div class="col-md-6 mb-3">
+                                <h6 class="text-capitalize">{{ category.replace('_', ' ') }}</h6>
+                                {% if features is iterable and features is not string and features is not number %}
+                                <ul class="list-unstyled">
+                                    {% for feature in features %}
+                                    <li><i class="fas fa-check text-success me-2"></i>{{ feature }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% else %}
+                                <p><i class="fas fa-info-circle text-info me-2"></i>{{ features }}</p>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Venue Description -->
+            {% if venue.description %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>About This Place
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p>{{ venue.description }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recommendations -->
+            {% if recommendations %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>Accessibility Recommendations
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for rec in recommendations %}
+                        <div class="col-md-6 mb-3">
+                            <div class="recommendation-item">
+                                <h6>{{ rec.title }}</h6>
+                                <p class="text-muted small">{{ rec.description }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Reviews Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-comments me-2"></i>Reviews
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if current_user.is_authenticated or bypass_auth %}
+                    <!-- Add/Edit Review -->
+                    <div class="review-form mb-4">
+                        {% if user_review %}
+                        <h5>Your Review</h5>
+                        <div class="existing-review mb-3">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="rating-stars mb-1">
+                                        {% for i in range(1, 6) %}
+                                            {% if i <= user_review.rating %}
+                                                <i class="fas fa-star text-warning"></i>
+                                            {% else %}
+                                                <i class="far fa-star text-warning"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <p>{{ user_review.comment }}</p>
+                                    <small class="text-muted">{{ user_review.created_at.strftime('%B %d, %Y') }}</small>
+                                </div>
+                                <button class="btn btn-sm btn-outline-primary" onclick="editReview()">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </div>
+                        </div>
+                        {% else %}
+                        <h5>Write a Review</h5>
+                        {% endif %}
+                        
+                        <form id="reviewForm" class="review-form-inputs" {% if user_review %}style="display: none;"{% endif %}>
+                            <div class="mb-3">
+                                <label class="form-label">Rating</label>
+                                <div class="rating-input">
+                                    {% for i in range(1, 6) %}
+                                    <input type="radio" name="rating" value="{{ i }}" id="star{{ i }}" 
+                                           {% if user_review and user_review.rating == i %}checked{% endif %}>
+                                    <label for="star{{ i }}"><i class="fas fa-star"></i></label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="comment" class="form-label">Comment</label>
+                                <textarea class="form-control" name="comment" id="comment" rows="3" 
+                                          placeholder="Share your accessibility experience...">{% if user_review %}{{ user_review.comment }}{% endif %}</textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                {% if user_review %}Update Review{% else %}Submit Review{% endif %}
+                            </button>
+                            {% if user_review %}
+                            <button type="button" class="btn btn-secondary ms-2" onclick="cancelEdit()">Cancel</button>
+                            {% endif %}
+                        </form>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recent Reviews -->
+                    {% if recent_reviews %}
+                    <h5>Recent Reviews</h5>
+                    {% for review in recent_reviews %}
+                    {% if not user_review or review.id != user_review.id %}
+                    <div class="review-item mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <div class="rating-stars mb-1">
+                                    {% for i in range(1, 6) %}
+                                        {% if i <= review.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                <p>{{ review.comment }}</p>
+                                <small class="text-muted">
+                                    By {{ review.user.first_name }} on {{ review.created_at.strftime('%B %d, %Y') }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No reviews yet. Be the first to share your experience!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Quick Info -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Quick Info</h4>
+                </div>
+                <div class="card-body">
+                    {% if venue.hours %}
+                    <div class="info-item mb-3">
+                        <h6><i class="fas fa-clock me-2"></i>Hours</h6>
+                        <p class="mb-0">{{ venue.hours }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if venue.price_level %}
+                    <div class="info-item mb-3">
+                        <h6><i class="fas fa-dollar-sign me-2"></i>Price Level</h6>
+                        <p class="mb-0">
+                            {% for i in range(venue.price_level) %}${% endfor %}
+                        </p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="info-item">
+                        <h6><i class="fas fa-map-marker-alt me-2"></i>Location</h6>
+                        <p class="mb-2">{{ venue.address }}</p>
+                        {% if venue.latitude and venue.longitude %}
+                        <a href="https://maps.google.com/?q={{ venue.latitude }},{{ venue.longitude }}" 
+                           target="_blank" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-directions me-1"></i>Get Directions
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Similar Venues -->
+            {% if similar_venues %}
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">
+                        <i class="fas fa-thumbs-up me-2"></i>Similar Accessible Venues
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% for similar in similar_venues %}
+                    <div class="similar-venue mb-3">
+                        <h6 class="mb-1">
+                            <a href="{{ url_for('main.venue_detail', venue_id=similar.id) }}">
+                                {{ similar.name }}
+                            </a>
+                        </h6>
+                        <p class="text-muted small mb-1">{{ similar.address }}</p>
+                        <div class="accessibility-score accessibility-small">
+                            <i class="fas fa-wheelchair me-1"></i>{{ similar|accessibility_score }}%
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Back to Results -->
+    <div class="mt-4">
+        <a href="{{ url_for('main.search') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Search Results
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize favorite buttons
+    if (typeof AccessibleOutings !== 'undefined') {
+        AccessibleOutings.favorites.initButtons();
+    }
+    
+    // Handle review form submission
+    const reviewForm = document.getElementById('reviewForm');
+    if (reviewForm) {
+        reviewForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {
+                venue_id: {{ venue.id|tojson }},
+                rating: formData.get('rating'),
+                comment: formData.get('comment')
+            };
+            
+            fetch('/api/reviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error submitting review: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error submitting review');
+            });
+        });
+    }
+});
+
+function editReview() {
+    document.querySelector('.existing-review').style.display = 'none';
+    document.querySelector('.review-form-inputs').style.display = 'block';
+}
+
+function cancelEdit() {
+    document.querySelector('.existing-review').style.display = 'block';
+    document.querySelector('.review-form-inputs').style.display = 'none';
+}
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+.accessibility-score-large {
+    text-align: center;
+}
+
+.score-circle {
+    display: inline-block;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid;
+    position: relative;
+    margin: 0 auto;
+}
+
+.score-circle.excellent { border-color: #28a745; }
+.score-circle.good { border-color: #17a2b8; }
+.score-circle.fair { border-color: #ffc107; }
+.score-circle.limited { border-color: #dc3545; }
+
+.score-number {
+    display: block;
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: -10px;
+}
+
+.score-label {
+    display: block;
+    font-size: 12px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin-top: 15px;
+}
+
+.rating-input {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.rating-input input[type="radio"] {
+    display: none;
+}
+
+.rating-input label {
+    cursor: pointer;
+    font-size: 20px;
+    color: #ddd;
+    transition: color 0.2s;
+}
+
+.rating-input input[type="radio"]:checked ~ label,
+.rating-input label:hover,
+.rating-input label:hover ~ label {
+    color: #ffc107;
+}
+
+.rating-input input[type="radio"]:checked + label,
+.rating-input input[type="radio"]:checked + label ~ label {
+    color: #ffc107;
+}
+
+.review-item {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.similar-venue {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.similar-venue:last-child {
+    border-bottom: none;
+}
+
+.accessibility-small {
+    font-size: 12px;
+}
+
+.info-item h6 {
+    color: #666;
+    margin-bottom: 5px;
+}
+</style>
+{% endblock %}
