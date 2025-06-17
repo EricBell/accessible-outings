@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+
+{% block title %}About - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Hero Section -->
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6">
+            <h1 class="display-4 mb-4">Making the World More Accessible</h1>
+            <p class="lead">
+                Accessible Outings Finder helps people with mobility challenges discover and enjoy 
+                accessible venues in their community. We believe everyone deserves to explore, 
+                discover, and participate in the world around them.
+            </p>
+        </div>
+        <div class="col-lg-6 text-center">
+            <img src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                 alt="Person in wheelchair at museum" 
+                 class="img-fluid rounded shadow-lg"
+                 style="max-height: 400px; object-fit: cover;">
+        </div>
+    </div>
+
+    <!-- Mission Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 bg-light">
+                <div class="card-body p-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h2 class="mb-4">
+                                <i class="fas fa-heart text-primary me-3"></i>Our Mission
+                            </h2>
+                            <p class="mb-3">
+                                We're committed to breaking down barriers and creating a more inclusive world. 
+                                Our platform connects people with accessible venues, providing detailed information 
+                                about wheelchair accessibility, parking, restrooms, and other essential features.
+                            </p>
+                            <p class="mb-0">
+                                Whether you're planning a family outing, a romantic dinner, or exploring a new city, 
+                                we help you find places where everyone can participate fully and comfortably.
+                            </p>
+                        </div>
+                        <div class="col-lg-4 text-center">
+                            <img src="https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=400&q=80" 
+                                 alt="Accessible entrance with ramp" 
+                                 class="img-fluid rounded shadow"
+                                 style="max-height: 250px; object-fit: cover;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="text-center mb-5">
+                <i class="fas fa-star text-primary me-3"></i>What We Offer
+            </h2>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-wheelchair text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="card-title">Detailed Accessibility Info</h4>
+                    <p class="card-text">
+                        Comprehensive accessibility ratings and features for each venue, 
+                        including wheelchair access, parking, restrooms, and seating options.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-map-marker-alt text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="card-title">Location-Based Search</h4>
+                    <p class="card-text">
+                        Find accessible venues near you with customizable search radius. 
+                        Get directions and plan your visit with confidence.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-body text-center p-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-users text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4 class="card-title">Community Reviews</h4>
+                    <p class="card-text">
+                        Read and share real experiences from other visitors. 
+                        Help build a community of accessible travel knowledge.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Categories Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 bg-primary text-white">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">
+                        <i class="fas fa-th-large me-3"></i>Discover Accessible Venues
+                    </h2>
+                    <p class="text-center mb-4 lead">
+                        From museums and gardens to shopping centers and theaters, 
+                        explore a wide variety of accessible destinations.
+                    </p>
+                    <div class="row text-center">
+                        <div class="col-md-3 mb-3">
+                            <i class="fas fa-university mb-2" style="font-size: 2rem;"></i>
+                            <h5>Museums</h5>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <i class="fas fa-leaf mb-2" style="font-size: 2rem;"></i>
+                            <h5>Gardens</h5>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <i class="fas fa-shopping-bag mb-2" style="font-size: 2rem;"></i>
+                            <h5>Shopping</h5>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <i class="fas fa-theater-masks mb-2" style="font-size: 2rem;"></i>
+                            <h5>Entertainment</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team/Contact Section -->
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card border-0 shadow">
+                <div class="card-body p-5 text-center">
+                    <h2 class="mb-4">
+                        <i class="fas fa-envelope text-primary me-3"></i>Get In Touch
+                    </h2>
+                    <p class="lead mb-4">
+                        Have a suggestion for a venue? Found an error in our accessibility information? 
+                        We'd love to hear from you!
+                    </p>
+                    <p class="mb-4">
+                        Our goal is to make this platform as comprehensive and accurate as possible. 
+                        Your feedback helps us serve the accessibility community better.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="contact-item">
+                                <i class="fas fa-envelope text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                <h5>Email Us</h5>
+                                <p class="mb-0">hello@accessibleoutings.fun</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="contact-item">
+                                <i class="fas fa-plus-circle text-primary mb-2" style="font-size: 1.5rem;"></i>
+                                <h5>Suggest a Venue</h5>
+                                <p class="mb-0">Help us grow our database</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-2"></i>Start Exploring
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+.feature-icon {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contact-item {
+    padding: 20px;
+    border-radius: 10px;
+    background: #f8f9fa;
+    height: 100%;
+}
+
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+}
+
+.img-fluid {
+    transition: transform 0.3s ease;
+}
+
+.img-fluid:hover {
+    transform: scale(1.02);
+}
+
+/* Responsive image sizing */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2.5rem;
+    }
+    
+    .lead {
+        font-size: 1.1rem;
+    }
+    
+    .feature-icon i {
+        font-size: 2.5rem !important;
+    }
+}
+</style>
+{% endblock %}
