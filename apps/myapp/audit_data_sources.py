@@ -51,7 +51,7 @@ class DataSourceAuditor:
                     'name': venue.name,
                     'has_google_place_id': bool(getattr(venue, 'google_place_id', None)),
                     'has_coordinates': bool(venue.latitude and venue.longitude),
-                    'has_accessibility_data': bool(venue.accessibility_features),
+                    'has_accessibility_data': bool(venue.accessibility_features_list),
                     'has_phone': bool(venue.phone),
                     'has_website': bool(venue.website),
                     'creation_method': 'unknown'
@@ -267,7 +267,9 @@ class DataSourceAuditor:
             score_samples = []
             
             for venue in venues:
-                if venue.accessibility_features:
+                # Check if venue has accessibility data
+                accessibility_features_list = venue.accessibility_features_list
+                if accessibility_features_list:
                     from utils.accessibility import AccessibilityFilter
                     score = AccessibilityFilter.calculate_accessibility_score(venue)
                     
@@ -275,14 +277,24 @@ class DataSourceAuditor:
                     calc_analysis['score_range']['max'] = max(calc_analysis['score_range']['max'], score)
                     
                     # Track which features are considered
-                    for feature in venue.accessibility_features.keys():
+                    accessibility_columns = [
+                        'wheelchair_accessible', 'accessible_parking', 'accessible_restroom',
+                        'elevator_access', 'wide_doorways', 'ramp_access', 'accessible_seating'
+                    ]
+                    for feature in accessibility_columns:
                         if feature not in calc_analysis['features_tracked']:
                             calc_analysis['features_tracked'].append(feature)
+                    
+                    # Count True accessibility features
+                    true_features = len([f for f in [
+                        venue.wheelchair_accessible, venue.accessible_parking, venue.accessible_restroom,
+                        venue.elevator_access, venue.wide_doorways, venue.ramp_access, venue.accessible_seating
+                    ] if f is True])
                     
                     score_samples.append({
                         'venue_id': venue.id,
                         'score': score,
-                        'features_count': len([f for f in venue.accessibility_features.values() if f is True]),
+                        'features_count': true_features,
                         'calculation_source': 'AccessibilityFilter.calculate_accessibility_score'
                     })
             

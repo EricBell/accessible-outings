@@ -105,19 +105,25 @@ class DataSourceValidator:
                         venue_suspicious = True
                 
                 # Check for realistic accessibility features
-                if venue.accessibility_features:
-                    if not isinstance(venue.accessibility_features, dict):
-                        self.log_error(f"Venue {venue.id} accessibility", "Accessibility features not in dict format")
-                        venue_suspicious = True
-                    else:
-                        # Validate accessibility feature keys
-                        expected_keys = [
-                            'wheelchair_accessible', 'accessible_parking', 
-                            'accessible_restroom', 'accessible_entrance'
-                        ]
-                        for key in venue.accessibility_features.keys():
-                            if key not in expected_keys and not key.startswith('accessible_'):
-                                self.log_warning(f"Venue {venue.id} accessibility", f"Unexpected feature key: {key}")
+                accessibility_features = [
+                    venue.wheelchair_accessible,
+                    venue.accessible_parking,
+                    venue.accessible_restroom,
+                    venue.elevator_access,
+                    venue.wide_doorways,
+                    venue.ramp_access,
+                    venue.accessible_seating
+                ]
+                
+                # Check if all features are None (no data) or if they have realistic distribution
+                non_null_features = [f for f in accessibility_features if f is not None]
+                if non_null_features:
+                    true_features = [f for f in non_null_features if f is True]
+                    # Realistic venues shouldn't have ALL features or NO features
+                    if len(true_features) == len(non_null_features) and len(non_null_features) > 5:
+                        self.log_warning(f"Venue {venue.id} accessibility", "All accessibility features are True (suspicious)")
+                else:
+                    self.log_warning(f"Venue {venue.id} accessibility", "No accessibility data available")
                 
                 if not venue_suspicious:
                     self.log_success(f"Venue {venue.id} ({venue.name[:30]}...)")
@@ -131,7 +137,19 @@ class DataSourceValidator:
             venues = Venue.query.limit(5).all()
             
             for venue in venues:
-                if not venue.accessibility_features:
+                # Check if venue has any accessibility data
+                accessibility_features = [
+                    venue.wheelchair_accessible,
+                    venue.accessible_parking,
+                    venue.accessible_restroom,
+                    venue.elevator_access,
+                    venue.wide_doorways,
+                    venue.ramp_access,
+                    venue.accessible_seating
+                ]
+                
+                non_null_features = [f for f in accessibility_features if f is not None]
+                if not non_null_features:
                     self.log_warning(f"Venue {venue.id} score", "No accessibility features to score")
                     continue
                 
@@ -144,17 +162,16 @@ class DataSourceValidator:
                     continue
                 
                 # Verify score correlates with features
-                features = venue.accessibility_features
-                wheelchair_accessible = features.get('wheelchair_accessible', False)
+                wheelchair_accessible = venue.wheelchair_accessible
                 
                 # If venue claims to be wheelchair accessible, score should be reasonable
                 if wheelchair_accessible and calculated_score < 30:
                     self.log_warning(f"Venue {venue.id} score", 
                                    f"Low score ({calculated_score}) despite wheelchair accessibility")
                 
-                # If no accessibility features, score should be low
-                accessible_features = sum(1 for v in features.values() if v is True)
-                if accessible_features == 0 and calculated_score > 20:
+                # If no accessibility features are True, score should be low
+                true_features = [f for f in accessibility_features if f is True]
+                if len(true_features) == 0 and calculated_score > 20:
                     self.log_warning(f"Venue {venue.id} score", 
                                    f"High score ({calculated_score}) with no accessible features")
                 
@@ -256,8 +273,8 @@ class DataSourceValidator:
                 venue_service = VenueSearchService(google_api)
                 
                 # Try a search and validate response structure
-                test_venues = venue_service.search_nearby_venues(
-                    latitude=40.7128, longitude=-74.0060, radius=1000, category=None
+                test_venues = venue_service.search_venues(
+                    latitude=40.7128, longitude=-74.0060, radius_miles=1, category=None
                 )
                 
                 if test_venues:
