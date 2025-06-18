@@ -1,3 +1,3 @@
-ssh_host = "accessibleoutings@accessibleoutings.fun"
+ssh_host = "accessibleoutings@50.116.57.169"
 remote_path = "/home/accessibleoutings/public_html/flaskapp/"
 restart_cmd = "chmod +x /home/accessibleoutings/public_html/flaskapp/restart.sh && /home/accessibleoutings/public_html/flaskapp/restart.sh"

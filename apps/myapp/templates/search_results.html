@@ -51,8 +51,7 @@
                     
                     <p class="card-text text-muted small mb-2">
                         <i class="fas fa-map-marker-alt me-1"></i>
-                        {{ venue.address }}
-                        {% if venue.city %}, {{ venue.city }}{% endif %}
+                        {{ venue.full_address }}
                     </p>
                     
                     {% if search_params.latitude and search_params.longitude %}

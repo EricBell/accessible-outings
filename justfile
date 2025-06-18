@@ -2,16 +2,9 @@ set dotenv-load
 
 # Deployment entry point
 deploy target:
-	#!/bin/bash
 	echo "Deploying {{target}}..."
-	set -e
-	REMOTE_PATH=$(just just-remote-path {{target}})
-	SSH_HOST=$(just just-ssh-host {{target}})
-	RESTART_CMD=$(just just-restart-cmd {{target}})
-	echo "→ syncing to $SSH_HOST:$REMOTE_PATH"
-	rsync -avz --delete ./ "$SSH_HOST:$REMOTE_PATH" --exclude=".git" --exclude="instance/" --exclude="__pycache__" --exclude="*.pyc" --exclude=".env" --exclude=".venv"
-	echo "→ restarting with: $RESTART_CMD"
-	ssh "$SSH_HOST" "$RESTART_CMD"
+	rsync -avz --delete ./ "accessibleoutings@50.116.57.169:/home/accessibleoutings/public_html/flaskapp/" --exclude=".git" --exclude="instance/" --exclude="__pycache__" --exclude="*.pyc" --exclude=".env" --exclude=".venv"
+	ssh "accessibleoutings@50.116.57.169" "sed -i 's/\r$//' /home/accessibleoutings/public_html/flaskapp/restart.sh && chmod +x /home/accessibleoutings/public_html/flaskapp/restart.sh && bash /home/accessibleoutings/public_html/flaskapp/restart.sh"
 
 
 

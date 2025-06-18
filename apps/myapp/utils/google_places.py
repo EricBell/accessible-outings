@@ -204,18 +204,19 @@ class GooglePlacesAPI:
         }
         
         # Parse address components
-        if len(address_components) >= 2:
-            # Try to extract city, state, zip from formatted address
-            last_part = address_components[-1]  # Usually "State ZIP, Country"
-            if ', ' in last_part:
-                state_zip = last_part.split(', ')[0]
-                if ' ' in state_zip:
-                    parts = state_zip.split(' ')
-                    venue_data['state'] = parts[0]
-                    venue_data['zip_code'] = parts[1] if len(parts) > 1 else None
+        if len(address_components) >= 3:
+            # Extract state and zip from the component before last (usually "NH 03301")
+            state_zip_part = address_components[-2]  # Usually "State ZIP"
+            if ' ' in state_zip_part:
+                parts = state_zip_part.split(' ')
+                venue_data['state'] = parts[0]
+                venue_data['zip_code'] = parts[1] if len(parts) > 1 else None
             
-            if len(address_components) >= 3:
-                venue_data['city'] = address_components[-2]
+            # City is the component before state/zip (usually the actual city name)
+            if len(address_components) >= 4:
+                venue_data['city'] = address_components[-3]
+            elif len(address_components) == 3:
+                venue_data['city'] = address_components[1]
         
         # Extract operating hours
         opening_hours = place_data.get('opening_hours', {})
