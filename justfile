@@ -27,4 +27,4 @@ just-ssh-host name:
     @grep '^ssh_host' config/{{name}}.toml | cut -d'=' -f2- | tr -d ' "'
 
 just-restart-cmd name:
-    @grep '^restart_cmd' config/{{name}}.toml | cut -d'=' -f2- | tr -d ' "'
+    @grep '^restart_cmd' config/{{name}}.toml | cut -d'=' -f2- | tr -d '"' | sed 's/^ *//'
