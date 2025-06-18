@@ -116,7 +116,7 @@ class DataSourceAuditor:
                     'username_pattern': self._analyze_username_pattern(user.username),
                     'email_domain': user.email.split('@')[1] if '@' in user.email else 'invalid',
                     'has_zip_code': bool(user.home_zip_code),
-                    'review_count': len(user.reviews) if hasattr(user, 'reviews') else 0,
+                    'review_count': user.reviews.count() if hasattr(user, 'reviews') else 0,
                     'creation_method': 'registration_form'
                 }
                 
@@ -226,7 +226,7 @@ class DataSourceAuditor:
                     'id': category.id,
                     'name': category.name,
                     'has_search_keywords': bool(category.search_keywords),
-                    'venue_count': len(category.venues) if hasattr(category, 'venues') else 0,
+                    'venue_count': category.venues.count() if hasattr(category, 'venues') else 0,
                     'creation_method': 'application_initialization'
                 }
                 

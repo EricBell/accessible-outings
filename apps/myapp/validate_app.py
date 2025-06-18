@@ -167,7 +167,7 @@ class AppValidator:
             from models.user import User
             
             # Check that models have required attributes
-            venue_attrs = ['name', 'address', 'latitude', 'longitude', 'accessibility_features']
+            venue_attrs = ['name', 'address', 'latitude', 'longitude', 'wheelchair_accessible']
             for attr in venue_attrs:
                 self.check(
                     f"Venue model has {attr}",
