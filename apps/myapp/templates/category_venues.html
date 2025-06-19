@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}{{ category.name }} Venues - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <!-- Category Header -->
+    <div class="category-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-2">
+                    <i class="{{ category.icon }} me-2"></i>{{ category.name }}
+                </h2>
+                <p class="mb-0">
+                    Found <strong>{{ venues|length }}</strong> venues in this category
+                    {% if venues %}
+                    <span class="badge bg-success ms-2">
+                        <i class="fas fa-wheelchair me-1"></i>{{ accessible_count }} Wheelchair Accessible
+                    </span>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <a href="{{ url_for('main.categories') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left me-2"></i>All Categories
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if venues %}
+    <!-- Category Venues -->
+    <div class="row g-4">
+        {% for venue in venues %}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 venue-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ venue.name }}</h5>
+                        {% if current_user.is_authenticated or bypass_auth %}
+                        <button class="favorite-btn" 
+                                data-venue-id="{{ venue.id }}"
+                                aria-label="Add to favorites">
+                            <i class="far fa-heart"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                    
+                    <p class="card-text text-muted small mb-2">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        {{ venue.address }}
+                    </p>
+                    
+                    <!-- Accessibility Features -->
+                    <div class="accessibility-badges mb-3">
+                        {% if venue.wheelchair_accessible %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-wheelchair me-1"></i>Wheelchair Accessible
+                        </span>
+                        {% endif %}
+                        {% if venue.accessible_parking %}
+                        <span class="badge bg-info">
+                            <i class="fas fa-parking me-1"></i>Accessible Parking
+                        </span>
+                        {% endif %}
+                        {% if venue.accessible_restroom %}
+                        <span class="badge bg-secondary">
+                            <i class="fas fa-restroom me-1"></i>Accessible Restroom
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Rating -->
+                    {% if venue.rating %}
+                    <div class="rating mb-2">
+                        <span class="rating-stars">
+                            {% for i in range(5) %}
+                                {% if i < venue.rating %}
+                                    <i class="fas fa-star text-warning"></i>
+                                {% else %}
+                                    <i class="far fa-star text-muted"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        <span class="rating-text ms-2">{{ "%.1f"|format(venue.rating) }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Distance -->
+                    {% if venue.distance %}
+                    <p class="distance-info mb-2">
+                        <i class="fas fa-route me-1"></i>
+                        {{ "%.1f"|format(venue.distance) }} miles away
+                    </p>
+                    {% endif %}
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <a href="{{ url_for('main.venue_detail', venue_id=venue.id) }}" 
+                       class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-info-circle me-2"></i>View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- No Venues Found -->
+    <div class="text-center py-5">
+        <i class="fas fa-map-marker-alt fa-3x text-muted mb-3"></i>
+        <h4 class="text-muted">No venues found in this category</h4>
+        <p class="text-muted mb-4">Try searching for venues or check other categories.</p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                <i class="fas fa-search me-2"></i>Search Venues
+            </a>
+            <a href="{{ url_for('main.categories') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-list me-2"></i>Browse Categories
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

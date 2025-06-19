@@ -52,3 +52,10 @@ python -m unittest unit_tests.VenueDetailTestCase.test_venue_detail_template_mis
 - `templates/venue_detail.html` - **MISSING** - This needs to be created
 - `unit_tests.py` - Tests that verify the missing template issue
 - `routes/main.py` - Contains the venue detail route that fails
+
+# Setup and Configuration a new environment
+1. Clone this project
+2. Root level, create venv named .venv.
+3. source the venv and install requirements.
+4. copy apps/myapp/.env to its placae in this config
+

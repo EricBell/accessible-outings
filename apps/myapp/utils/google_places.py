@@ -182,6 +182,92 @@ class GooglePlacesAPI:
         
         return accessibility
     
+    def map_google_types_to_category(self, place_data: Dict) -> Optional[int]:
+        """Map Google Place types to venue category IDs."""
+        place_types = place_data.get('types', [])
+        
+        # Mapping of Google Place types to category IDs (based on schema.sql)
+        type_category_mapping = {
+            # Museums (id: 3)
+            'museum': 3,
+            'art_gallery': 3,
+            'establishment': None,  # Too generic, check other types
+            
+            # Aquariums (id: 4) 
+            'aquarium': 4,
+            'zoo': 4,
+            
+            # Shopping Centers (id: 5)
+            'shopping_mall': 5,
+            'department_store': 5,
+            'store': 5,
+            
+            # Antique Shops (id: 6)
+            'home_goods_store': 6,  # Could be antique
+            'furniture_store': 6,
+            
+            # Art Galleries (id: 7)
+            'art_gallery': 7,
+            
+            # Libraries (id: 8)
+            'library': 8,
+            
+            # Theaters (id: 9)
+            'movie_theater': 9,
+            'stadium': 9,
+            'performing_arts_theater': 9,
+            
+            # Craft Stores (id: 10)
+            'craft_store': 10,
+            'book_store': 10,  # Often have crafts
+            
+            # Garden Centers (id: 11) 
+            'florist': 11,
+            'store': None,  # Too generic
+            
+            # Conservatories (id: 12) - will be harder to detect
+            'park': 1,  # Botanical Gardens (id: 1)
+            'establishment': None,
+            
+            # Generic mappings
+            'point_of_interest': None,  # Too generic
+            'tourist_attraction': None,  # Could be any category
+        }
+        
+        # Priority order - more specific types first
+        priority_types = [
+            'museum', 'art_gallery', 'aquarium', 'zoo', 'shopping_mall', 
+            'library', 'movie_theater', 'performing_arts_theater', 
+            'craft_store', 'florist', 'park'
+        ]
+        
+        # Check priority types first
+        for ptype in priority_types:
+            if ptype in place_types:
+                category_id = type_category_mapping.get(ptype)
+                if category_id:
+                    return category_id
+        
+        # Check name-based categorization for harder cases
+        name_lower = place_data.get('name', '').lower()
+        
+        if any(keyword in name_lower for keyword in ['botanical', 'garden', 'conservatory', 'arboretum']):
+            return 1  # Botanical Gardens
+        elif any(keyword in name_lower for keyword in ['bird', 'aviary', 'nature center', 'wildlife']):
+            return 2  # Bird Watching  
+        elif any(keyword in name_lower for keyword in ['antique', 'vintage', 'collectible', 'consignment']):
+            return 6  # Antique Shops
+        elif any(keyword in name_lower for keyword in ['theater', 'theatre', 'cinema', 'playhouse']):
+            return 9  # Theaters
+        elif any(keyword in name_lower for keyword in ['craft', 'hobby', 'art supply', 'fabric']):
+            return 10  # Craft Stores
+        elif any(keyword in name_lower for keyword in ['nursery', 'plant', 'greenhouse']):
+            return 11  # Garden Centers
+        elif any(keyword in name_lower for keyword in ['conservatory', 'glass house', 'tropical house']):
+            return 12  # Conservatories
+            
+        return None  # No category match found
+    
     def convert_to_venue_data(self, place_data: Dict, category_id: int = None) -> Dict:
         """Convert Google Places data to venue data format."""
         geometry = place_data.get('geometry', {})
@@ -189,6 +275,10 @@ class GooglePlacesAPI:
         
         # Extract address components
         address_components = place_data.get('formatted_address', '').split(', ')
+        
+        # Auto-categorize if no category provided
+        if category_id is None:
+            category_id = self.map_google_types_to_category(place_data)
         
         venue_data = {
             'google_place_id': place_data.get('place_id'),

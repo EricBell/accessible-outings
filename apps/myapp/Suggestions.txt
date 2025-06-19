@@ -524,3 +524,9 @@ Reset to starting condictions
 
   This should provide an excellent test of an LLM's ability to handle complex, multi-domain software engineering challenges! The tests are comprehensive enough
   that even partial implementations would be valuable contributions to the codebase.
+
+250619 add new categories
+1. create a way to try and discover new categories. 
+2. Category editor. Add/edit/delete categories.
+3. Add full contact informatoin everywhere = like phone number
+4. add venue description information where it's missing.
