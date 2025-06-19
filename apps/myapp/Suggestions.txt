@@ -530,3 +530,6 @@ Reset to starting condictions
 2. Category editor. Add/edit/delete categories.
 3. Add full contact informatoin everywhere = like phone number
 4. add venue description information where it's missing.
+5. looking at categories and there are 0 venue for e.g. bird watching, add a Find Nearest feature 
+   to search and locate one or more. 
+6. Pull out the 'theme' so this can be reskined.
