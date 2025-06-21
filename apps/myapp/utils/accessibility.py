@@ -243,6 +243,11 @@ class AccessibilityRecommendations:
         accessible_venues = len([v for v in venues if v.wheelchair_accessible])
         avg_score = sum(AccessibilityFilter.calculate_accessibility_score(v) for v in venues) / total_venues
         
+        # Calculate interestingness statistics
+        interestingness_scores = [float(v.interestingness_score) for v in venues if v.interestingness_score]
+        avg_interestingness = sum(interestingness_scores) / len(interestingness_scores) if interestingness_scores else 0.0
+        high_interest_venues = len([s for s in interestingness_scores if s >= 6.0])
+        
         # Get most common features
         feature_counts = {}
         for venue in venues:
@@ -257,7 +262,9 @@ class AccessibilityRecommendations:
             'accessible_count': accessible_venues,
             'accessibility_percentage': round((accessible_venues / total_venues) * 100, 1),
             'average_score': round(avg_score * 100, 1),
-            'common_features': common_features
+            'common_features': common_features,
+            'average_interestingness': round(avg_interestingness, 1),
+            'high_interest_count': high_interest_venues
         }
     
     @classmethod

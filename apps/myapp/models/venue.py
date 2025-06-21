@@ -88,6 +88,11 @@ class Venue(db.Model):
     hours_sunday = db.Column(db.String(50))
     seasonal_hours = db.Column(db.Text)
     
+    # Experience and Interest Scoring
+    experience_tags = db.Column(DatabaseCompatArray())  # e.g., ['hands-on', 'interactive', 'quirky']
+    interestingness_score = db.Column(db.Numeric(3, 2), default=0.0)  # 0.0-10.0 scale
+    event_frequency_score = db.Column(db.Integer, default=0)  # How often events happen (0-5)
+    
     # Metadata
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -300,6 +305,100 @@ class Venue(db.Model):
         )
         
         return query.all()
+    
+    def add_experience_tag(self, tag: str):
+        """Add an experience tag to the venue."""
+        if not self.experience_tags:
+            self.experience_tags = []
+        if tag not in self.experience_tags:
+            self.experience_tags.append(tag)
+    
+    def remove_experience_tag(self, tag: str):
+        """Remove an experience tag from the venue."""
+        if self.experience_tags and tag in self.experience_tags:
+            self.experience_tags.remove(tag)
+    
+    def has_experience_tag(self, tag: str) -> bool:
+        """Check if venue has a specific experience tag."""
+        return self.experience_tags and tag in self.experience_tags
+    
+    def calculate_interestingness_score(self) -> float:
+        """Calculate the interestingness score based on various factors."""
+        score = 0.0
+        
+        # Base score from category (some venues are inherently more interesting)
+        category_scores = {
+            1: 7.0,   # Botanical Gardens - inherently interesting
+            2: 8.0,   # Bird Watching - unique experience
+            3: 6.5,   # Museums - varies widely
+            4: 8.5,   # Aquariums - usually engaging
+            5: 2.0,   # Shopping Centers - generic
+            6: 7.5,   # Antique Shops - unique finds
+            7: 7.0,   # Art Galleries - creative experiences
+            8: 5.0,   # Libraries - depends on programming
+            9: 4.0,   # Theaters - depends on shows
+            10: 6.0,  # Craft Stores - hands-on potential
+            11: 6.5,  # Garden Centers - seasonal interest
+            12: 8.0   # Conservatories - unique environments
+        }
+        
+        if self.category_id:
+            score += category_scores.get(self.category_id, 5.0)
+        
+        # Experience tags boost
+        interesting_tags = [
+            'hands-on', 'interactive', 'quirky', 'unique', 'educational',
+            'guided-tours', 'live-performances', 'workshops', 'demonstrations',
+            'seasonal-events', 'family-friendly', 'behind-the-scenes'
+        ]
+        
+        if self.experience_tags:
+            tag_boost = sum(1.0 for tag in self.experience_tags if tag in interesting_tags)
+            score += min(tag_boost * 0.5, 2.0)  # Max 2.0 boost from tags
+        
+        # Event frequency boost
+        if self.event_frequency_score:
+            score += self.event_frequency_score * 0.3  # Max 1.5 boost
+        
+        # Accessibility quality boost (good accessibility = better experience)
+        accessibility_features = [
+            self.wheelchair_accessible, self.accessible_parking, 
+            self.accessible_restroom, self.ramp_access, self.elevator_access
+        ]
+        accessibility_score = sum(accessibility_features) / len(accessibility_features)
+        score += accessibility_score * 1.0  # Max 1.0 boost
+        
+        # User rating boost (if available)
+        if self.google_rating:
+            rating_boost = (float(self.google_rating) - 3.0) * 0.5  # Scale 1-5 to -1 to +1
+            score += rating_boost
+        
+        # Cap at 10.0
+        return min(float(score), 10.0)
+    
+    def update_interestingness_score(self):
+        """Update and save the interestingness score."""
+        self.interestingness_score = self.calculate_interestingness_score()
+        self.last_updated = datetime.utcnow()
+    
+    def get_experience_summary(self) -> str:
+        """Get a human-readable summary of the venue's experience."""
+        if not self.experience_tags:
+            return "Standard venue experience"
+        
+        tag_descriptions = {
+            'hands-on': 'interactive activities',
+            'quirky': 'unique and offbeat',
+            'educational': 'learning opportunities',
+            'guided-tours': 'expert-led tours',
+            'live-performances': 'live entertainment',
+            'workshops': 'skill-building workshops',
+            'seasonal-events': 'seasonal activities',
+            'family-friendly': 'great for families'
+        }
+        
+        descriptions = [tag_descriptions.get(tag, tag) for tag in self.experience_tags[:3]]
+        return f"Features {', '.join(descriptions)}"
     
     def __repr__(self):
         return f'<Venue {self.name}>'

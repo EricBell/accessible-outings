@@ -63,6 +63,39 @@
                     </p>
                     {% endif %}
                     
+                    <!-- Experience & Interestingness -->
+                    {% if venue.interestingness_score and venue.interestingness_score > 0 %}
+                    <div class="mb-2">
+                        <div class="d-flex align-items-center">
+                            {% if venue.interestingness_score >= 7 %}
+                            <span class="badge bg-success me-2">
+                                <i class="fas fa-star me-1"></i>Highly Interesting ({{ "%.1f"|format(venue.interestingness_score) }}/10)
+                            </span>
+                            {% elif venue.interestingness_score >= 5 %}
+                            <span class="badge bg-info me-2">
+                                <i class="fas fa-star me-1"></i>Interesting ({{ "%.1f"|format(venue.interestingness_score) }}/10)
+                            </span>
+                            {% elif venue.interestingness_score >= 3 %}
+                            <span class="badge bg-warning me-2">
+                                <i class="fas fa-star me-1"></i>Moderately Interesting ({{ "%.1f"|format(venue.interestingness_score) }}/10)
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Experience Tags -->
+                        {% if venue.experience_tags %}
+                        <div class="mt-1">
+                            {% for tag in venue.experience_tags[:3] %}
+                            <span class="badge badge-outline-primary me-1">{{ tag }}</span>
+                            {% endfor %}
+                            {% if venue.experience_tags|length > 3 %}
+                            <span class="text-muted small">+{{ venue.experience_tags|length - 3 }} more</span>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
                     <!-- Accessibility Score -->
                     {% set score = venue|accessibility_score %}
                     <div class="mb-2">

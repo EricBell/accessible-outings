@@ -268,6 +268,85 @@ class GooglePlacesAPI:
             
         return None  # No category match found
     
+    def _analyze_venue_experience(self, place_data: Dict, category_id: int = None) -> Dict:
+        """Analyze venue experience and assign tags and scores."""
+        from utils.experience_tagger import ExperienceTagger
+        
+        # Create temporary venue object for analysis
+        class TempVenue:
+            def __init__(self, name, category_id, accessibility_info):
+                self.name = name
+                self.category_id = category_id
+                self.google_rating = place_data.get('rating')
+                
+                # Set accessibility features from extracted info
+                self.wheelchair_accessible = accessibility_info.get('wheelchair_accessible', False)
+                self.accessible_parking = accessibility_info.get('accessible_parking', False)
+                self.accessible_restroom = accessibility_info.get('accessible_restroom', False)
+                self.ramp_access = accessibility_info.get('ramp_access', False)
+                self.elevator_access = accessibility_info.get('elevator_access', False)
+                self.wide_doorways = accessibility_info.get('wide_doorways', False)
+                self.accessible_seating = accessibility_info.get('accessible_seating', False)
+                
+                # Mock reviews for analysis
+                self.reviews = type('MockRelation', (), {'count': lambda: 0})()
+        
+        # Extract accessibility info first (needed for temp venue)
+        accessibility_info = self.extract_accessibility_info(place_data)
+        
+        # Create temp venue for experience analysis
+        temp_venue = TempVenue(
+            place_data.get('name', ''),
+            category_id,
+            accessibility_info
+        )
+        
+        # Analyze experience tags
+        experience_tags = ExperienceTagger.analyze_venue_experience(temp_venue, place_data)
+        
+        # Calculate event frequency score based on venue type and characteristics
+        event_frequency_score = self._estimate_event_frequency(place_data, category_id, experience_tags)
+        
+        return {
+            'experience_tags': experience_tags,
+            'event_frequency_score': event_frequency_score,
+            'interestingness_score': 0.0,  # Will be calculated after venue creation
+        }
+    
+    def _estimate_event_frequency(self, place_data: Dict, category_id: int, experience_tags: List[str]) -> int:
+        """Estimate how frequently a venue hosts events (0-5 scale)."""
+        score = 0
+        
+        # Base score by category
+        category_event_scores = {
+            1: 3,   # Botanical Gardens - seasonal events
+            2: 2,   # Bird Watching - occasional guided tours
+            3: 4,   # Museums - frequent exhibitions and events
+            4: 3,   # Aquariums - regular feeding shows, events
+            5: 1,   # Shopping Centers - rare events
+            6: 2,   # Antique Shops - occasional sales/shows
+            7: 4,   # Art Galleries - regular exhibitions
+            8: 3,   # Libraries - programs and events
+            9: 5,   # Theaters - constant programming
+            10: 3,  # Craft Stores - workshops
+            11: 2,  # Garden Centers - seasonal events
+            12: 3   # Conservatories - seasonal displays
+        }
+        
+        if category_id in category_event_scores:
+            score = category_event_scores[category_id]
+        
+        # Boost for experience tags that suggest regular programming
+        event_boosting_tags = ['workshops', 'demonstrations', 'guided-tours', 'live-performances']
+        if any(tag in experience_tags for tag in event_boosting_tags):
+            score = min(score + 1, 5)
+        
+        # Boost for larger/established venues (higher ratings often indicate active programming)
+        if place_data.get('rating') and float(place_data['rating']) >= 4.0:
+            score = min(score + 1, 5)
+        
+        return score
+    
     def convert_to_venue_data(self, place_data: Dict, category_id: int = None) -> Dict:
         """Convert Google Places data to venue data format."""
         geometry = place_data.get('geometry', {})
@@ -292,6 +371,9 @@ class GooglePlacesAPI:
             'price_level': place_data.get('price_level'),
             'category_id': category_id
         }
+        
+        # Add experience tags and interestingness scoring
+        venue_data.update(self._analyze_venue_experience(place_data, category_id))
         
         # Parse address components
         if len(address_components) >= 3:
@@ -374,8 +456,17 @@ class VenueSearchService:
                 logger.error(f"Error processing place data: {e}")
                 continue
         
-        # Sort by distance
-        venues.sort(key=lambda v: v.distance_from(latitude, longitude) or float('inf'))
+        # Sort by interestingness first, then by distance
+        def sort_key(venue):
+            distance = venue.distance_from(latitude, longitude) or float('inf')
+            interestingness = float(venue.interestingness_score) if venue.interestingness_score else 0.0
+            
+            # Primary sort: interestingness (higher is better)
+            # Secondary sort: distance (lower is better)
+            # Combine: higher interestingness score wins, distance breaks ties
+            return (-interestingness, distance)
+        
+        venues.sort(key=sort_key)
         
         return venues
     
@@ -416,9 +507,12 @@ class VenueSearchService:
         venue = Venue(**venue_data)
         db.session.add(venue)
         
+        # Calculate and set interestingness score after venue is created
+        venue.update_interestingness_score()
+        
         try:
             db.session.commit()
-            logger.info(f"Created new venue: {venue.name}")
+            logger.info(f"Created new venue: {venue.name} (interestingness: {venue.interestingness_score})")
             return venue
         except Exception as e:
             db.session.rollback()

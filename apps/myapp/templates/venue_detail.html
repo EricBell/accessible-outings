@@ -63,6 +63,83 @@
     <div class="row">
         <!-- Main Content -->
         <div class="col-lg-8">
+            <!-- Experience & Interestingness -->
+            {% if venue.interestingness_score and venue.interestingness_score > 0 %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-star me-2"></i>Experience Quality
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div class="interestingness-meter mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="fw-bold">Interestingness Score:</span>
+                                    <span class="badge bg-primary fs-6">{{ "%.1f"|format(venue.interestingness_score) }}/10</span>
+                                </div>
+                                <div class="progress mt-2" style="height: 8px;">
+                                    <div class="progress-bar" role="progressbar" 
+                                         style="width: {{ (venue.interestingness_score * 10)|round }}%"
+                                         aria-valuenow="{{ venue.interestingness_score * 10 }}" 
+                                         aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            {% if venue.event_frequency_score and venue.event_frequency_score > 0 %}
+                            <div class="event-frequency">
+                                <span class="fw-bold">Event Activity:</span>
+                                <div class="mt-1">
+                                    {% for i in range(5) %}
+                                        {% if i < venue.event_frequency_score %}
+                                            <i class="fas fa-calendar text-warning me-1"></i>
+                                        {% else %}
+                                            <i class="far fa-calendar text-muted me-1"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <small class="text-muted">({{ venue.event_frequency_score }}/5)</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Tags -->
+                    {% if venue.experience_tags %}
+                    <div class="experience-tags mt-3">
+                        <h6 class="mb-2">Experience Features:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for tag in venue.experience_tags %}
+                            <span class="badge bg-light text-dark border">
+                                {% if tag == 'hands-on' %}<i class="fas fa-hand-paper me-1"></i>
+                                {% elif tag == 'quirky' %}<i class="fas fa-surprise me-1"></i>
+                                {% elif tag == 'educational' %}<i class="fas fa-graduation-cap me-1"></i>
+                                {% elif tag == 'artistic' %}<i class="fas fa-palette me-1"></i>
+                                {% elif tag == 'historic' %}<i class="fas fa-landmark me-1"></i>
+                                {% elif tag == 'family-friendly' %}<i class="fas fa-users me-1"></i>
+                                {% elif tag == 'peaceful' %}<i class="fas fa-leaf me-1"></i>
+                                {% elif tag == 'immersive' %}<i class="fas fa-vr-cardboard me-1"></i>
+                                {% else %}<i class="fas fa-tag me-1"></i>
+                                {% endif %}
+                                {{ tag.replace('-', ' ').title() }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Experience Summary -->
+                    <div class="mt-3">
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            {{ venue.get_experience_summary() }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             <!-- Accessibility Score -->
             {% set score = venue|accessibility_score %}
             <div class="card mb-4">

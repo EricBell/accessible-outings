@@ -34,6 +34,15 @@
                             <span class="text-success">
                                 {{ insights.accessibility_percentage }}% wheelchair accessible
                             </span>
+                            {% if insights.average_interestingness and insights.average_interestingness > 0 %}
+                            <br>
+                            <span class="text-info">
+                                <i class="fas fa-star me-1"></i>{{ insights.average_interestingness }}/10 avg interest
+                                {% if insights.high_interest_count > 0 %}
+                                ({{ insights.high_interest_count }} highly interesting)
+                                {% endif %}
+                            </span>
+                            {% endif %}
                             {% endif %}
                         </small>
                     </div>
