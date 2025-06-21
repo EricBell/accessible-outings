@@ -56,6 +56,124 @@ def apply_venue_schema_updates(cursor):
         else:
             print(f"  ✓ {col_name} column already exists")
 
+def create_events_tables(cursor):
+    """Create events-related tables if they don't exist."""
+    print("Creating events tables...")
+    
+    # Check if events table exists
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='events'")
+    if not cursor.fetchone():
+        print("  Creating events table...")
+        cursor.execute('''
+        CREATE TABLE events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title VARCHAR(500) NOT NULL,
+            description TEXT,
+            venue_id INTEGER NOT NULL REFERENCES venues(id),
+            start_date DATE NOT NULL,
+            start_time TIME,
+            end_date DATE,
+            end_time TIME,
+            duration_hours REAL,
+            is_fun BOOLEAN DEFAULT 0,
+            is_interesting BOOLEAN DEFAULT 0,
+            is_off_beat BOOLEAN DEFAULT 0,
+            cost VARCHAR(100),
+            registration_required BOOLEAN DEFAULT 0,
+            registration_url VARCHAR(500),
+            contact_phone VARCHAR(20),
+            contact_email VARCHAR(120),
+            max_participants INTEGER,
+            age_restriction VARCHAR(50),
+            audience_type VARCHAR(100),
+            wheelchair_accessible BOOLEAN DEFAULT 0,
+            hearing_accessible BOOLEAN DEFAULT 0,
+            vision_accessible BOOLEAN DEFAULT 0,
+            mobility_accommodations TEXT,
+            accessibility_notes TEXT,
+            indoor_outdoor VARCHAR(20),
+            weather_dependent BOOLEAN DEFAULT 0,
+            bring_items TEXT,
+            provided_items TEXT,
+            experience_tags TEXT,
+            fun_score DECIMAL(3,2) DEFAULT 0.0,
+            learning_potential DECIMAL(3,2) DEFAULT 0.0,
+            uniqueness_score DECIMAL(3,2) DEFAULT 0.0,
+            event_url VARCHAR(500),
+            image_url VARCHAR(500),
+            social_media_links TEXT,
+            source VARCHAR(100),
+            external_id VARCHAR(255),
+            last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            is_recurring BOOLEAN DEFAULT 0,
+            recurrence_pattern VARCHAR(100)
+        )
+        ''')
+        print("  ✓ Created events table")
+    else:
+        print("  ✓ Events table already exists")
+    
+    # Check if event_favorites table exists
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='event_favorites'")
+    if not cursor.fetchone():
+        print("  Creating event_favorites table...")
+        cursor.execute('''
+        CREATE TABLE event_favorites (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            event_id INTEGER NOT NULL REFERENCES events(id),
+            notes TEXT,
+            reminder_set BOOLEAN DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(user_id, event_id)
+        )
+        ''')
+        print("  ✓ Created event_favorites table")
+    else:
+        print("  ✓ Event_favorites table already exists")
+    
+    # Check if event_reviews table exists
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='event_reviews'")
+    if not cursor.fetchone():
+        print("  Creating event_reviews table...")
+        cursor.execute('''
+        CREATE TABLE event_reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            event_id INTEGER NOT NULL REFERENCES events(id),
+            attended BOOLEAN DEFAULT 1,
+            overall_rating INTEGER,
+            accessibility_rating INTEGER,
+            fun_rating INTEGER,
+            review_text TEXT,
+            accessibility_notes TEXT,
+            would_attend_again BOOLEAN,
+            would_recommend BOOLEAN,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        ''')
+        print("  ✓ Created event_reviews table")
+    else:
+        print("  ✓ Event_reviews table already exists")
+    
+    # Create indexes for events
+    indexes = [
+        "CREATE INDEX IF NOT EXISTS idx_events_start_date ON events(start_date)",
+        "CREATE INDEX IF NOT EXISTS idx_events_venue_id ON events(venue_id)",
+        "CREATE INDEX IF NOT EXISTS idx_events_is_fun ON events(is_fun)",
+        "CREATE INDEX IF NOT EXISTS idx_events_is_interesting ON events(is_interesting)",
+        "CREATE INDEX IF NOT EXISTS idx_events_is_off_beat ON events(is_off_beat)",
+        "CREATE INDEX IF NOT EXISTS idx_events_wheelchair_accessible ON events(wheelchair_accessible)",
+        "CREATE INDEX IF NOT EXISTS idx_event_favorites_user_id ON event_favorites(user_id)",
+        "CREATE INDEX IF NOT EXISTS idx_event_reviews_event_id ON event_reviews(event_id)"
+    ]
+    
+    for index_sql in indexes:
+        cursor.execute(index_sql)
+    
+    print("  ✓ Created event indexes")
+
 def enable_admin_for_username(cursor):
     """Enable admin features for the 'admin' username account."""
     print("Configuring admin access...")
@@ -159,6 +277,7 @@ def run_migration():
         # Apply schema updates
         apply_user_schema_updates(cursor)
         apply_venue_schema_updates(cursor)
+        create_events_tables(cursor)
         
         # Configure admin access
         enable_admin_for_username(cursor)

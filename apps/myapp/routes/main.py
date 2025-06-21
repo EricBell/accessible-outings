@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app, jsonify, abort
 from flask_login import login_required, current_user
 from functools import wraps
+from datetime import date, datetime, timedelta
 from models import db
 from models.venue import Venue, VenueCategory
+from models.event import Event, EventFavorite, EventReview
 from models.review import UserFavorite, UserReview, SearchHistory
 from models.user import User
 from utils.accessibility import AccessibilityFilter, AccessibilityRecommendations
@@ -18,12 +20,18 @@ def get_current_user():
 
 @main_bp.route('/')
 def index():
-    """Home page with search form."""
+    """Home page with event search form."""
     categories = VenueCategory.query.all()
     
     # Get user's home ZIP code if available
     user = get_current_user()
     default_zip = user.home_zip_code if user else None
+    
+    # Get today's events as featured content
+    todays_events = Event.get_todays_events()[:6]  # Show up to 6 today's events
+    
+    # Get upcoming events this week
+    upcoming_events = Event.get_upcoming_events(7)[:8]  # Show up to 8 upcoming events
     
     # Get recent searches for suggestions
     recent_searches = []
@@ -33,19 +41,56 @@ def index():
     return render_template('index.html', 
                          categories=categories, 
                          default_zip=default_zip,
-                         recent_searches=recent_searches)
+                         recent_searches=recent_searches,
+                         todays_events=todays_events,
+                         upcoming_events=upcoming_events,
+                         today_date=date.today().isoformat())
 
 @main_bp.route('/search')
 def search():
-    """Search for venues."""
+    """Search for events."""
     zip_code = request.args.get('zip_code')
     category_id = request.args.get('category_id', type=int)
     radius = request.args.get('radius', 30, type=int)
     accessible_only = request.args.get('accessible_only', False, type=bool)
     
+    # Event-specific parameters
+    start_date_str = request.args.get('start_date')
+    end_date_str = request.args.get('end_date')
+    event_types = request.args.getlist('event_types')  # Can be 'fun', 'interesting', 'off_beat'
+    search_today = request.args.get('search_today', False, type=bool)
+    
     if not zip_code:
         flash('Please provide a ZIP code to search.', 'error')
         return redirect(url_for('main.index'))
+    
+    # Handle date filtering
+    start_date = None
+    end_date = None
+    
+    if search_today:
+        start_date = date.today()
+        end_date = date.today()
+    else:
+        if start_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                flash('Invalid start date format.', 'error')
+                return redirect(url_for('main.index'))
+        
+        if end_date_str:
+            try:
+                end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                flash('Invalid end date format.', 'error')
+                return redirect(url_for('main.index'))
+    
+    # Default to showing events from today for the next 30 days if no dates specified
+    if not start_date:
+        start_date = date.today()
+    if not end_date:
+        end_date = start_date + timedelta(days=30)
     
     # Validate and get coordinates
     coordinates = current_app.location_service.get_search_coordinates(
@@ -60,14 +105,26 @@ def search():
     
     latitude, longitude = coordinates
     
-    # Search for venues
+    # Search for venues in the area first
     try:
         venues = current_app.venue_search_service.search_venues(
             latitude=latitude,
             longitude=longitude,
             radius_miles=radius,
             category_id=category_id,
-            wheelchair_accessible_only=accessible_only
+            wheelchair_accessible_only=False  # We'll filter events separately
+        )
+        
+        # Get venue IDs for event filtering
+        venue_ids = [venue.id for venue in venues] if venues else []
+        
+        # Search for events
+        events = Event.search_events(
+            start_date=start_date,
+            end_date=end_date,
+            event_types=event_types,
+            wheelchair_accessible_only=accessible_only,
+            venue_ids=venue_ids
         )
         
         # Log search for analytics
@@ -78,7 +135,7 @@ def search():
                 search_zip=zip_code,
                 search_radius=radius,
                 category_filter=category_id,
-                results_count=len(venues),
+                results_count=len(events),
                 accessibility_filter=accessible_only
             )
         
@@ -91,28 +148,94 @@ def search():
         except:
             location_name = f"ZIP {zip_code}"
         
-        return render_template('search_results.html',
-                             venues=venues,
+        return render_template('event_search_results.html',
+                             events=events,
                              search_params={
                                  'zip_code': zip_code,
                                  'category_id': category_id,
                                  'radius': radius,
                                  'accessible_only': accessible_only,
+                                 'start_date': start_date.isoformat(),
+                                 'end_date': end_date.isoformat(),
+                                 'event_types': event_types,
+                                 'search_today': search_today,
                                  'latitude': latitude,
                                  'longitude': longitude
                              },
                              category=category,
                              location_name=location_name,
-                             total_results=len(venues))
+                             total_results=len(events))
         
     except Exception as e:
-        current_app.logger.error(f"Search error: {e}")
+        current_app.logger.error(f"Event search error: {e}")
         # Check if it's a Google API issue
         if "REQUEST_DENIED" in str(e):
             flash('Google Places API is not available. Please check your API key configuration.', 'warning')
         else:
-            flash('Search failed. Please try again.', 'error')
+            flash('Event search failed. Please try again.', 'error')
         return redirect(url_for('main.index'))
+
+@main_bp.route('/events/today')
+def events_today():
+    """Show today's events."""
+    events = Event.get_todays_events()
+    return render_template('events_today.html', events=events, today=date.today())
+
+@main_bp.route('/events/upcoming')
+def events_upcoming():
+    """Show upcoming events."""
+    days = request.args.get('days', 7, type=int)
+    events = Event.get_upcoming_events(days)
+    return render_template('events_upcoming.html', events=events, days=days)
+
+@main_bp.route('/event/<int:event_id>')
+def event_detail(event_id):
+    """Event detail page."""
+    event = Event.query.get(event_id)
+    if not event:
+        flash('Event not found.', 'error')
+        return redirect(url_for('main.index'))
+    
+    # Get venue accessibility summary
+    accessibility_summary = AccessibilityFilter.get_accessibility_summary(event.venue)
+    
+    # Check if user has favorited this event
+    user = get_current_user()
+    is_favorited = False
+    user_review = None
+    
+    if user:
+        is_favorited = EventFavorite.query.filter_by(user_id=user.id, event_id=event_id).first() is not None
+        user_review = EventReview.query.filter_by(user_id=user.id, event_id=event_id).first()
+    
+    # Get recent reviews
+    recent_reviews = EventReview.query.filter_by(event_id=event_id)\
+                                     .order_by(EventReview.created_at.desc())\
+                                     .limit(5).all()
+    
+    # Get similar events (same category and type)
+    similar_events = Event.query.filter(
+        Event.venue.has(category_id=event.venue.category_id),
+        Event.id != event_id,
+        Event.start_date >= date.today()
+    )
+    
+    if event.is_fun:
+        similar_events = similar_events.filter(Event.is_fun == True)
+    elif event.is_interesting:
+        similar_events = similar_events.filter(Event.is_interesting == True)
+    elif event.is_off_beat:
+        similar_events = similar_events.filter(Event.is_off_beat == True)
+    
+    similar_events = similar_events.limit(3).all()
+    
+    return render_template('event_detail.html',
+                         event=event,
+                         accessibility_summary=accessibility_summary,
+                         similar_events=similar_events,
+                         is_favorited=is_favorited,
+                         user_review=user_review,
+                         recent_reviews=recent_reviews)
 
 @main_bp.route('/venue/<int:venue_id>')
 def venue_detail(venue_id):

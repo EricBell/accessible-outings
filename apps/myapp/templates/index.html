@@ -7,10 +7,10 @@
     <!-- Hero Section -->
     <div class="row mb-5">
         <div class="col-lg-8 mx-auto text-center">
-            <h1 class="display-4 mb-4">Find Accessible Indoor Activities</h1>
+            <h1 class="display-4 mb-4">Find Accessible Events & Activities</h1>
             <p class="lead mb-4">
-                Discover wheelchair-friendly museums, aquariums, gardens, and more in your area. 
-                Perfect for rainy days or when you need accessible indoor entertainment.
+                Discover fun, interesting, and off-beat events happening at accessible venues near you. 
+                From acrylic painting classes to ghost tours, find your next accessible adventure.
             </p>
         </div>
     </div>
@@ -21,7 +21,7 @@
             <div class="card shadow">
                 <div class="card-body p-4">
                     <h3 class="card-title text-center mb-4">
-                        <i class="fas fa-search me-2"></i>Search for Venues
+                        <i class="fas fa-calendar-alt me-2"></i>Search for Events
                     </h3>
                     
                     <form action="{{ url_for('main.search') }}" method="GET" id="searchForm">
@@ -54,6 +54,74 @@
                                 <div class="form-text">Filter by venue type</div>
                             </div>
                             
+                            <!-- Time Period Selection -->
+                            <div class="col-12">
+                                <label class="form-label">When are you looking for events?</label>
+                                <div class="row g-2">
+                                    <div class="col-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="time_period" id="today" value="today" checked>
+                                            <label class="form-check-label" for="today">
+                                                <i class="fas fa-calendar-day me-1"></i>Today
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="time_period" id="date_range" value="date_range">
+                                            <label class="form-check-label" for="date_range">
+                                                <i class="fas fa-calendar-week me-1"></i>Date Range
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Date Range Pickers (Hidden by default) -->
+                            <div class="col-md-6" id="start_date_group" style="display: none;">
+                                <label for="start_date" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="start_date" name="start_date" value="{{ today_date }}">
+                            </div>
+                            
+                            <div class="col-md-6" id="end_date_group" style="display: none;">
+                                <label for="end_date" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="end_date" name="end_date">
+                            </div>
+                            
+                            <!-- Event Type Checkboxes -->
+                            <div class="col-12">
+                                <label class="form-label">What type of events interest you? (Check all that apply)</label>
+                                <div class="row g-2">
+                                    <div class="col-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="fun" name="event_types" value="fun">
+                                            <label class="form-check-label" for="fun">
+                                                <i class="fas fa-smile me-1 text-success"></i>Fun
+                                                <small class="text-muted d-block">Hands-on activities, painting, crafts</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="interesting" name="event_types" value="interesting">
+                                            <label class="form-check-label" for="interesting">
+                                                <i class="fas fa-brain me-1 text-info"></i>Interesting
+                                                <small class="text-muted d-block">Lectures, workshops, learning</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="off_beat" name="event_types" value="off_beat">
+                                            <label class="form-check-label" for="off_beat">
+                                                <i class="fas fa-eye me-1 text-warning"></i>Off-beat
+                                                <small class="text-muted d-block">Ghost tours, unique experiences</small>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <!-- Radius -->
                             <div class="col-md-6">
                                 <label for="radius" class="form-label">Search Radius</label>
@@ -76,7 +144,7 @@
                                            value="true">
                                     <label class="form-check-label" for="accessible_only">
                                         <i class="fas fa-wheelchair me-1"></i>
-                                        Wheelchair accessible only
+                                        Wheelchair accessible events only
                                     </label>
                                 </div>
                             </div>
@@ -84,7 +152,7 @@
                             <!-- Search Button -->
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary btn-lg w-100">
-                                    <i class="fas fa-search me-2"></i>Find Accessible Venues
+                                    <i class="fas fa-calendar-search me-2"></i>Find Accessible Events
                                 </button>
                             </div>
                         </div>
@@ -118,6 +186,72 @@
                     {% endif %}
                 </a>
                 {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Today's Events -->
+    {% if todays_events %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">
+                <i class="fas fa-calendar-day me-2"></i>Today's Events
+            </h3>
+            <div class="row g-3">
+                {% for event in todays_events %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ event.title }}</h6>
+                            <p class="card-text small text-muted">{{ event.venue.name }}</p>
+                            <p class="card-text"><i class="fas fa-clock me-1"></i>{{ event.get_time_display() }}</p>
+                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                {% for event_type in event.get_event_types() %}
+                                <span class="badge bg-secondary">{{ event_type }}</span>
+                                {% endfor %}
+                            </div>
+                            <a href="{{ url_for('main.event_detail', event_id=event.id) }}" class="btn btn-primary btn-sm">View Event</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('main.events_today') }}" class="btn btn-outline-primary">View All Today's Events</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Upcoming Events -->
+    {% if upcoming_events %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <h3 class="text-center mb-4">
+                <i class="fas fa-calendar-week me-2"></i>Upcoming Events
+            </h3>
+            <div class="row g-3">
+                {% for event in upcoming_events %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h6 class="card-title">{{ event.title }}</h6>
+                            <p class="card-text small text-muted">{{ event.venue.name }}</p>
+                            <p class="card-text"><i class="fas fa-calendar me-1"></i>{{ event.get_date_display() }}</p>
+                            <div class="d-flex flex-wrap gap-1 mb-2">
+                                {% for event_type in event.get_event_types() %}
+                                <span class="badge bg-secondary">{{ event_type }}</span>
+                                {% endfor %}
+                            </div>
+                            <a href="{{ url_for('main.event_detail', event_id=event.id) }}" class="btn btn-primary btn-sm">View Event</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('main.events_upcoming') }}" class="btn btn-outline-primary">View All Upcoming Events</a>
             </div>
         </div>
     </div>
@@ -168,7 +302,7 @@
                         <i class="fas fa-wheelchair fa-3x text-primary mb-3"></i>
                         <h5>Accessibility First</h5>
                         <p class="text-muted">
-                            Every venue is evaluated for wheelchair accessibility, 
+                            Every event and venue is evaluated for wheelchair accessibility, 
                             with detailed information about ramps, elevators, and accessible facilities.
                         </p>
                     </div>
@@ -179,7 +313,7 @@
                         <h5>Community Reviews</h5>
                         <p class="text-muted">
                             Real reviews from people who understand accessibility needs, 
-                            helping you make informed decisions about where to visit.
+                            helping you make informed decisions about which events to attend.
                         </p>
                     </div>
                 </div>
@@ -188,7 +322,7 @@
                         <i class="fas fa-heart fa-3x text-primary mb-3"></i>
                         <h5>Save Favorites</h5>
                         <p class="text-muted">
-                            Keep track of venues you love and want to visit again, 
+                            Keep track of events and venues you love, 
                             with personal notes and accessibility ratings.
                         </p>
                     </div>
@@ -208,6 +342,44 @@ document.addEventListener('DOMContentLoaded', function() {
         zipInput.focus();
     }
     
+    // Date range toggle functionality
+    const todayRadio = document.getElementById('today');
+    const dateRangeRadio = document.getElementById('date_range');
+    const startDateGroup = document.getElementById('start_date_group');
+    const endDateGroup = document.getElementById('end_date_group');
+    const startDateInput = document.getElementById('start_date');
+    const endDateInput = document.getElementById('end_date');
+    
+    function toggleDateInputs() {
+        if (dateRangeRadio.checked) {
+            startDateGroup.style.display = 'block';
+            endDateGroup.style.display = 'block';
+            // Set default end date to 30 days from start date
+            if (!endDateInput.value && startDateInput.value) {
+                const startDate = new Date(startDateInput.value);
+                const endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 30);
+                endDateInput.value = endDate.toISOString().split('T')[0];
+            }
+        } else {
+            startDateGroup.style.display = 'none';
+            endDateGroup.style.display = 'none';
+        }
+    }
+    
+    todayRadio.addEventListener('change', toggleDateInputs);
+    dateRangeRadio.addEventListener('change', toggleDateInputs);
+    
+    // Set end date when start date changes
+    startDateInput.addEventListener('change', function() {
+        if (!endDateInput.value || new Date(endDateInput.value) < new Date(this.value)) {
+            const startDate = new Date(this.value);
+            const endDate = new Date(startDate);
+            endDate.setDate(startDate.getDate() + 30);
+            endDateInput.value = endDate.toISOString().split('T')[0];
+        }
+    });
+    
     // ZIP code validation
     zipInput.addEventListener('input', function() {
         const value = this.value.replace(/\D/g, ''); // Remove non-digits
@@ -218,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Form validation
+    // Form validation and submission handling
     document.getElementById('searchForm').addEventListener('submit', function(e) {
         const zipCode = zipInput.value.trim();
         if (!zipCode) {
@@ -236,7 +408,19 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Please enter a valid ZIP code (e.g., 12345 or 12345-6789).');
             return false;
         }
+        
+        // Add search_today parameter if today is selected
+        if (todayRadio.checked) {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'search_today';
+            hiddenInput.value = 'true';
+            this.appendChild(hiddenInput);
+        }
     });
+    
+    // Initialize date inputs
+    toggleDateInputs();
 });
 </script>
 {% endblock %}
