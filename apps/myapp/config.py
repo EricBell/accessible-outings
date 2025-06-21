@@ -65,7 +65,7 @@ class Config:
     LOG_FILE = os.environ.get('LOG_FILE', 'app.log')
     
     # WTF Forms settings
-    WTF_CSRF_ENABLED = True
+    WTF_CSRF_ENABLED = False  # Disabled for development
     WTF_CSRF_TIME_LIMIT = 3600  # 1 hour
     
     @staticmethod

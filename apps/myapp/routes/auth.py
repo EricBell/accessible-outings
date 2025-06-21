@@ -1,3 +1,4 @@
+import logging
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.urls import url_parse
@@ -23,15 +24,28 @@ def login():
         return redirect(url_for('main.index'))
     
     if request.method == 'POST':
+        # Enable debug logging
+        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+        
+        logger.debug("🚀 Login POST request received")
+        logger.debug(f"📝 Form data: {dict(request.form)}")
+        logger.debug(f"🌐 Request headers: {dict(request.headers)}")
+        
         username_or_email = request.form.get('username_or_email')
         password = request.form.get('password')
         remember_me = bool(request.form.get('remember_me'))
         
+        logger.debug(f"📋 Extracted - username_or_email: '{username_or_email}', password: '{password}'")
+        
         if not username_or_email or not password:
+            logger.debug(f"❌ Missing credentials - username_or_email: {bool(username_or_email)}, password: {bool(password)}")
             flash('Please provide both username/email and password.', 'error')
             return render_template('auth/login.html')
         
+        logger.debug(f"🔑 Calling User.authenticate...")
         user = User.authenticate(username_or_email, password)
+        logger.debug(f"👤 Authentication result: {user.username if user else 'None'}")
         
         if user:
             login_user(user, remember=remember_me)

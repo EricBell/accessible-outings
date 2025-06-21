@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Login Form</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; }
+        input { padding: 8px; width: 200px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; }
+        .debug { background: #f8f9fa; padding: 15px; margin: 20px 0; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Login Form Test</h1>
+    
+    <div class="debug">
+        <h3>🔧 Debug Info</h3>
+        <p><strong>Expected credentials:</strong></p>
+        <ul>
+            <li>Username: <code>admin</code> (lowercase)</li>
+            <li>Password: <code>password</code> (lowercase)</li>
+        </ul>
+        <p><strong>Form action:</strong> This form posts to /auth/login</p>
+        <p><strong>Field names:</strong> username_or_email, password</p>
+    </div>
+    
+    <form method="POST" action="/auth/login" id="loginForm">
+        <div class="form-group">
+            <label for="username_or_email">Username or Email:</label>
+            <input type="text" 
+                   id="username_or_email" 
+                   name="username_or_email" 
+                   value="admin"
+                   autocomplete="off"
+                   required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" 
+                   id="password" 
+                   name="password" 
+                   value="password"
+                   autocomplete="off"
+                   required>
+        </div>
+        
+        <div class="form-group">
+            <label>
+                <input type="checkbox" name="remember_me"> Remember me
+            </label>
+        </div>
+        
+        <button type="submit">Login</button>
+    </form>
+    
+    <div class="debug">
+        <h3>🚀 Test Instructions</h3>
+        <ol>
+            <li>Open this file in your browser (file:// URL)</li>
+            <li>Change the action to your Flask server URL (e.g., http://localhost:5000/auth/login)</li>
+            <li>Click Login to test the form submission</li>
+            <li>Check Flask console for debug messages</li>
+        </ol>
+        
+        <h3>🔍 Troubleshooting</h3>
+        <ul>
+            <li><strong>Clear form fields</strong> and type manually (no copy/paste)</li>
+            <li><strong>Check for invisible characters</strong> in username/password</li>
+            <li><strong>Use browser dev tools</strong> to inspect form submission</li>
+            <li><strong>Verify Flask server</strong> is receiving POST data</li>
+        </ul>
+    </div>
+    
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            console.log('🚀 Form submitted');
+            console.log('📝 Username:', document.getElementById('username_or_email').value);
+            console.log('🔐 Password length:', document.getElementById('password').value.length);
+            console.log('📋 Form data:', new FormData(this));
+            
+            // Let the form submit naturally
+        });
+        
+        // Debug form data on page load
+        window.addEventListener('load', function() {
+            console.log('🔧 Debug form loaded');
+            console.log('📝 Default username:', document.getElementById('username_or_email').value);
+            console.log('🔐 Default password:', document.getElementById('password').value);
+        });
+    </script>
+</body>
+</html>

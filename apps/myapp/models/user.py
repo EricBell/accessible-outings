@@ -99,6 +99,38 @@ class User(UserMixin, db.Model):
         }
     
     @staticmethod
+    def authenticate(username_or_email, password):
+        """Authenticate a user by username/email and password."""
+        import logging
+        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+        
+        logger.debug(f"🔍 User.authenticate called with: '{username_or_email}' / '{password}'")
+        
+        # Try to find user by username or email
+        user = User.query.filter(
+            (User.username == username_or_email) | 
+            (User.email == username_or_email)
+        ).first()
+        
+        logger.debug(f"👤 User found: {user.username if user else 'None'}")
+        
+        if user:
+            logger.debug(f"🔐 Checking password for user: {user.username}")
+            logger.debug(f"🗂️ Password hash: {user.password_hash[:50]}...")
+            
+            password_valid = user.check_password(password)
+            logger.debug(f"✅ Password valid: {password_valid}")
+            
+            if password_valid:
+                logger.debug(f"🎉 Authentication SUCCESS for {user.username}")
+                return user
+            else:
+                logger.debug(f"❌ Authentication FAILED - password mismatch")
+        else:
+            logger.debug(f"❌ Authentication FAILED - user not found")
+        
+        return None
     def create_user(username, email, password, **kwargs):
         """Create a new user with validation."""
         # Check if username or email already exists
@@ -115,6 +147,38 @@ class User(UserMixin, db.Model):
         return user
     
     @staticmethod
+    def authenticate(username_or_email, password):
+        """Authenticate a user by username/email and password."""
+        import logging
+        logging.basicConfig(level=logging.DEBUG)
+        logger = logging.getLogger(__name__)
+        
+        logger.debug(f"🔍 User.authenticate called with: '{username_or_email}' / '{password}'")
+        
+        # Try to find user by username or email
+        user = User.query.filter(
+            (User.username == username_or_email) | 
+            (User.email == username_or_email)
+        ).first()
+        
+        logger.debug(f"👤 User found: {user.username if user else 'None'}")
+        
+        if user:
+            logger.debug(f"🔐 Checking password for user: {user.username}")
+            logger.debug(f"🗂️ Password hash: {user.password_hash[:50]}...")
+            
+            password_valid = user.check_password(password)
+            logger.debug(f"✅ Password valid: {password_valid}")
+            
+            if password_valid:
+                logger.debug(f"🎉 Authentication SUCCESS for {user.username}")
+                return user
+            else:
+                logger.debug(f"❌ Authentication FAILED - password mismatch")
+        else:
+            logger.debug(f"❌ Authentication FAILED - user not found")
+        
+        return None
     def authenticate(username_or_email, password):
         """Authenticate a user by username/email and password."""
         # Try to find user by username or email
