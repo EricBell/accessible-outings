@@ -21,6 +21,7 @@ CREATE TABLE users (
     home_zip_code VARCHAR(10),
     max_travel_minutes INTEGER DEFAULT 60,
     accessibility_needs TEXT,
+    is_admin BOOLEAN DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -68,6 +69,10 @@ CREATE TABLE venues (
     hours_saturday VARCHAR(50),
     hours_sunday VARCHAR(50),
     seasonal_hours TEXT,
+    -- Experience and Interest Scoring
+    experience_tags TEXT, -- JSON array of experience tags
+    interestingness_score DECIMAL(3,2) DEFAULT 0.0, -- 0.0-10.0 scale
+    event_frequency_score INTEGER DEFAULT 0, -- How often events happen (0-5)
     -- Metadata
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
