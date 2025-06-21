@@ -153,8 +153,9 @@ def create_app(config_class=None):
     # Template filters
     @app.template_filter('accessibility_score')
     def accessibility_score_filter(venue):
-        """Template filter to get accessibility score."""
-        return AccessibilityFilter.calculate_accessibility_score(venue)
+        """Template filter to get accessibility score as percentage with 2 decimal precision."""
+        score = AccessibilityFilter.calculate_accessibility_score(venue)
+        return round(score * 100, 2)  # Convert to percentage and round to 2 decimal places
     
     @app.template_filter('distance')
     def distance_filter(venue, latitude=None, longitude=None):

@@ -139,7 +139,12 @@ class Venue(db.Model):
             self.ramp_access,
             self.accessible_seating
         ]
-        return sum(1 for feature in features if feature) / len(features) * 100
+        return round((sum(1 for feature in features if feature) / len(features)) * 100, 2)
+    
+    def _get_comprehensive_accessibility_score(self):
+        """Get comprehensive accessibility score with proper rounding."""
+        from utils.accessibility import AccessibilityFilter
+        return round(AccessibilityFilter.calculate_accessibility_score(self) * 100, 2)
     
     @property
     def accessibility_features_list(self):
@@ -253,7 +258,7 @@ class Venue(db.Model):
             'ramp_access': self.ramp_access,
             'accessible_seating': self.accessible_seating,
             'accessibility_notes': self.accessibility_notes,
-            'accessibility_score': self.accessibility_score,
+            'accessibility_score': self._get_comprehensive_accessibility_score(),
             'accessibility_features': self.accessibility_features_list,
             'hours': self.get_all_hours(),
             'seasonal_hours': self.seasonal_hours,
