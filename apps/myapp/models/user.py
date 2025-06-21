@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     home_zip_code = db.Column(db.String(10))
     max_travel_minutes = db.Column(db.Integer, default=60)
     accessibility_needs = db.Column(db.Text)
+    is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -27,7 +28,7 @@ class User(UserMixin, db.Model):
     search_history = db.relationship('SearchHistory', backref='user', lazy='dynamic', cascade='all, delete-orphan')
     
     def __init__(self, username, email, password, first_name=None, last_name=None, 
-                 home_zip_code=None, max_travel_minutes=60, accessibility_needs=None):
+                 home_zip_code=None, max_travel_minutes=60, accessibility_needs=None, is_admin=False):
         """Initialize a new user."""
         self.username = username
         self.email = email
@@ -37,6 +38,7 @@ class User(UserMixin, db.Model):
         self.home_zip_code = home_zip_code
         self.max_travel_minutes = max_travel_minutes
         self.accessibility_needs = accessibility_needs
+        self.is_admin = is_admin
     
     def set_password(self, password):
         """Hash and set the user's password."""

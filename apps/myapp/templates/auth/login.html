@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Login - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3><i class="fas fa-sign-in-alt me-2"></i>Login</h3>
+                    <p class="text-muted mb-0">Sign in to your account</p>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="username_or_email" class="form-label">Username or Email</label>
+                            <input type="text" class="form-control" id="username_or_email" name="username_or_email" 
+                                   value="{{ request.form.username_or_email }}" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me">
+                            <label class="form-check-label" for="remember_me">
+                                Remember me
+                            </label>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <p class="mb-0">
+                        Don't have an account? 
+                        <a href="{{ url_for('auth.register') }}" class="text-decoration-none">Sign up here</a>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Admin Quick Login Hint -->
+            <div class="card mt-3">
+                <div class="card-body text-center bg-light">
+                    <small class="text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        <strong>Admin Access:</strong> Username: <code>admin</code>, Password: <code>password</code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

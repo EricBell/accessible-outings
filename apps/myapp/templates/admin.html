@@ -1,0 +1,280 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-cog me-2"></i>Admin Dashboard</h1>
+                <span class="badge bg-success">Admin Access</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_users }}</h4>
+                            <p class="card-text">Total Users</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_venues }}</h4>
+                            <p class="card-text">Total Venues</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-map-marker-alt fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_reviews }}</h4>
+                            <p class="card-text">Total Reviews</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-star fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <h4 class="card-title">{{ total_favorites }}</h4>
+                            <p class="card-text">Total Favorites</p>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-heart fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Data Quality Panel -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-chart-bar me-2"></i>Data Quality</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="text-success">{{ categorized_venues }}</h4>
+                                <small class="text-muted">Categorized Venues</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="text-center">
+                                <h4 class="text-warning">{{ uncategorized_venues }}</h4>
+                                <small class="text-muted">Uncategorized Venues</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if uncategorized_venues > 0 %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        {{ uncategorized_venues }} venues need categorization
+                    </div>
+                    {% endif %}
+                    
+                    <div class="progress mb-2">
+                        {% set categorization_percent = (categorized_venues / total_venues * 100) if total_venues > 0 else 0 %}
+                        <div class="progress-bar" role="progressbar" style="width: {{ categorization_percent }}%">
+                            {{ "%.1f"|format(categorization_percent) }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">Venue Categorization Progress</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Statistics -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>Category Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    {% if category_stats %}
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        {% for stat in category_stats %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ stat.name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ stat.venues_count }} venues</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-success">{{ stat.accessibility_percentage }}% accessible</span>
+                            </div>
+                        </div>
+                        {% if not loop.last %}<hr class="my-2">{% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No categorized venues yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Recent Users -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-user-plus me-2"></i>Recent Users</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_users %}
+                    <div class="list-group list-group-flush">
+                        {% for user in recent_users %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ user.username }}</strong>
+                                    {% if user.is_admin %}<span class="badge bg-danger ms-1">Admin</span>{% endif %}
+                                    <br>
+                                    <small class="text-muted">{{ user.email }}</small>
+                                </div>
+                                <small class="text-muted">{{ user.created_at.strftime('%m/%d/%Y') }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No users found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Interesting Venues -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-star me-2"></i>Most Interesting Venues</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_interesting_venues %}
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        {% for venue in top_interesting_venues %}
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>{{ venue.name }}</strong>
+                                <br>
+                                <small class="text-muted">{{ venue.city }}, {{ venue.state }}</small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-primary">{{ "%.1f"|format(venue.interestingness_score) }}/10</span>
+                                {% if venue.category %}
+                                <br><small class="text-muted">{{ venue.category.name }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if not loop.last %}<hr class="my-2">{% endif %}
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No venues with interestingness scores yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Reviews -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-comments me-2"></i>Recent Reviews</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_reviews %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Venue</th>
+                                    <th>Rating</th>
+                                    <th>Review</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for review in recent_reviews %}
+                                <tr>
+                                    <td>{{ review.user.username }}</td>
+                                    <td>
+                                        <strong>{{ review.venue.name }}</strong>
+                                        <br>
+                                        <small class="text-muted">{{ review.venue.city }}</small>
+                                    </td>
+                                    <td>
+                                        {% if review.overall_rating %}
+                                        <div class="rating-stars">
+                                            {% for i in range(1, 6) %}
+                                                {% if i <= review.overall_rating %}
+                                                    <i class="fas fa-star text-warning"></i>
+                                                {% else %}
+                                                    <i class="far fa-star text-muted"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if review.review_text %}
+                                        {{ review.review_text[:100] }}{% if review.review_text|length > 100 %}...{% endif %}
+                                        {% else %}
+                                        <em class="text-muted">No review text</em>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ review.created_at.strftime('%m/%d/%Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No reviews found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

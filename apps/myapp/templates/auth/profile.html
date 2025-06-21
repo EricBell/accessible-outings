@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3><i class="fas fa-user me-2"></i>My Profile</h3>
+                    {% if user.is_admin %}
+                    <span class="badge bg-danger">Admin</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Account Information</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Username:</strong></td>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Email:</strong></td>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Name:</strong></td>
+                                    <td>{{ user.full_name if user.full_name else 'Not provided' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Member Since:</strong></td>
+                                    <td>{{ user.created_at.strftime('%B %d, %Y') }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Preferences</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Home ZIP:</strong></td>
+                                    <td>{{ user.home_zip_code if user.home_zip_code else 'Not set' }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Max Travel:</strong></td>
+                                    <td>{{ user.max_travel_minutes }} minutes</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Accessibility Needs:</strong></td>
+                                    <td>{{ user.accessibility_needs if user.accessibility_needs else 'None specified' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('auth.edit_profile') }}" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+
+            <!-- Activity Summary -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar me-2"></i>Activity Summary</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4">
+                            <h4 class="text-primary">{{ user.favorites.count() }}</h4>
+                            <p class="text-muted">Favorite Venues</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h4 class="text-success">{{ user.reviews.count() }}</h4>
+                            <p class="text-muted">Reviews Written</p>
+                        </div>
+                        <div class="col-md-4">
+                            <h4 class="text-info">{{ user.search_history.count() }}</h4>
+                            <p class="text-muted">Searches Performed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

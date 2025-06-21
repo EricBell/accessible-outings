@@ -67,6 +67,12 @@
                             <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">
                                 <i class="fas fa-user me-2"></i>Profile
                             </a></li>
+                            {% if current_user.is_admin %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('main.admin') }}">
+                                <i class="fas fa-cog me-2"></i>Admin
+                            </a></li>
+                            {% endif %}
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}">
                                 <i class="fas fa-sign-out-alt me-2"></i>Logout
@@ -129,7 +135,7 @@
             <hr>
             <div class="row">
                 <div class="col-12 text-center">
-                    <p class="text-muted mb-0">&copy; 2025 {{ app_name }}. Built with accessibility in mind. <span class="text-muted" style="font-size:0.9em;">version 0.2.5</span></p>
+                    <p class="text-muted mb-0">&copy; 2025 {{ app_name }}. Built with accessibility in mind. <span class="text-muted" style="font-size:0.9em;">version 0.2.10</span></p>
                 </div>
             </div>
         </div>

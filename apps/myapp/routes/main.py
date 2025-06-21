@@ -1,8 +1,10 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app, jsonify
+from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app, jsonify, abort
 from flask_login import login_required, current_user
+from functools import wraps
 from models import db
 from models.venue import Venue, VenueCategory
 from models.review import UserFavorite, UserReview, SearchHistory
+from models.user import User
 from utils.accessibility import AccessibilityFilter, AccessibilityRecommendations
 
 main_bp = Blueprint('main', __name__)
@@ -370,3 +372,62 @@ def about():
 def accessibility_guide():
     """Accessibility guide page."""
     return render_template('accessibility_guide.html')
+
+def admin_required(f):
+    """Decorator to require admin privileges."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        user = get_current_user()
+        if not user or not getattr(user, 'is_admin', False):
+            abort(403)  # Forbidden
+        return f(*args, **kwargs)
+    return decorated_function
+
+@main_bp.route('/admin')
+@admin_required
+def admin():
+    """Admin dashboard page."""
+    # Get system statistics
+    total_users = User.query.count()
+    total_venues = Venue.query.count()
+    total_reviews = UserReview.query.count()
+    total_favorites = UserFavorite.query.count()
+    
+    # Get venues with categories
+    categorized_venues = Venue.query.filter(Venue.category_id.isnot(None)).count()
+    uncategorized_venues = total_venues - categorized_venues
+    
+    # Get recent activity
+    recent_users = User.query.order_by(User.created_at.desc()).limit(5).all()
+    recent_reviews = UserReview.query.order_by(UserReview.created_at.desc()).limit(5).all()
+    
+    # Get venue statistics by category
+    categories = VenueCategory.query.all()
+    category_stats = []
+    for category in categories:
+        venues_count = category.get_venues_count()
+        accessible_count = category.get_accessible_venues_count()
+        if venues_count > 0:
+            category_stats.append({
+                'name': category.name,
+                'venues_count': venues_count,
+                'accessible_count': accessible_count,
+                'accessibility_percentage': round((accessible_count / venues_count) * 100, 1)
+            })
+    
+    # Get top venues by interestingness
+    top_interesting_venues = Venue.query.filter(
+        Venue.interestingness_score.isnot(None)
+    ).order_by(Venue.interestingness_score.desc()).limit(10).all()
+    
+    return render_template('admin.html',
+                         total_users=total_users,
+                         total_venues=total_venues,
+                         total_reviews=total_reviews,
+                         total_favorites=total_favorites,
+                         categorized_venues=categorized_venues,
+                         uncategorized_venues=uncategorized_venues,
+                         recent_users=recent_users,
+                         recent_reviews=recent_reviews,
+                         category_stats=category_stats,
+                         top_interesting_venues=top_interesting_venues)
