@@ -405,5 +405,140 @@ class Venue(db.Model):
         descriptions = [tag_descriptions.get(tag, tag) for tag in self.experience_tags[:3]]
         return f"Features {', '.join(descriptions)}"
     
+    def get_reason_for_inclusion(self) -> dict:
+        """Generate a compelling reason why this venue is worth visiting."""
+        reasons = []
+        criteria_met = []
+        
+        # Get comprehensive accessibility score
+        from utils.accessibility import AccessibilityFilter
+        accessibility_score = AccessibilityFilter.calculate_accessibility_score(self) * 100
+        
+        # Accessibility criteria
+        if accessibility_score >= 80:
+            reasons.append("Exceptionally accessible with comprehensive accommodations")
+            criteria_met.append("Excellent accessibility (85%+)")
+        elif accessibility_score >= 60:
+            reasons.append("Well-equipped for accessibility needs")
+            criteria_met.append("Good accessibility (60%+)")
+        elif accessibility_score >= 40:
+            reasons.append("Provides basic accessibility features")
+            criteria_met.append("Fair accessibility (40%+)")
+        
+        # Specific accessibility features
+        key_features = []
+        if self.wheelchair_accessible:
+            key_features.append("wheelchair accessible entrance")
+        if self.accessible_parking:
+            key_features.append("accessible parking")
+        if self.accessible_restroom:
+            key_features.append("accessible restrooms")
+        if self.elevator_access:
+            key_features.append("elevator access")
+        if self.ramp_access:
+            key_features.append("ramp access")
+        
+        if key_features:
+            if len(key_features) == 1:
+                reasons.append(f"Features {key_features[0]}")
+            elif len(key_features) == 2:
+                reasons.append(f"Features {key_features[0]} and {key_features[1]}")
+            else:
+                reasons.append(f"Features {', '.join(key_features[:-1])}, and {key_features[-1]}")
+        
+        # Experience quality
+        if self.interestingness_score and float(self.interestingness_score) >= 7.0:
+            reasons.append("Offers a highly engaging and unique experience")
+            criteria_met.append("Highly interesting experience (7.0+/10)")
+        elif self.interestingness_score and float(self.interestingness_score) >= 5.0:
+            reasons.append("Provides an interesting and worthwhile experience")
+            criteria_met.append("Interesting experience (5.0+/10)")
+        elif self.interestingness_score and float(self.interestingness_score) >= 3.0:
+            reasons.append("Offers a moderately engaging experience")
+            criteria_met.append("Moderately interesting (3.0+/10)")
+        
+        # Experience tags that make it special
+        special_tags = []
+        if self.experience_tags:
+            tag_descriptions = {
+                'hands-on': 'hands-on activities',
+                'quirky': 'unique and offbeat character',
+                'educational': 'educational value',
+                'guided-tours': 'expert-guided tours',
+                'live-performances': 'live entertainment',
+                'workshops': 'skill-building workshops',
+                'immersive': 'immersive experiences',
+                'artistic': 'artistic focus',
+                'historic': 'historical significance',
+                'family-friendly': 'family-friendly atmosphere'
+            }
+            
+            for tag in self.experience_tags[:3]:
+                if tag in tag_descriptions:
+                    special_tags.append(tag_descriptions[tag])
+        
+        if special_tags:
+            if len(special_tags) == 1:
+                reasons.append(f"Stands out for its {special_tags[0]}")
+            elif len(special_tags) == 2:
+                reasons.append(f"Notable for {special_tags[0]} and {special_tags[1]}")
+            else:
+                reasons.append(f"Distinguished by {', '.join(special_tags[:-1])}, and {special_tags[-1]}")
+        
+        # Event activity
+        if self.event_frequency_score and self.event_frequency_score >= 4:
+            reasons.append("Regularly hosts events and activities")
+            criteria_met.append("High event activity (4+/5)")
+        elif self.event_frequency_score and self.event_frequency_score >= 2:
+            reasons.append("Occasionally offers special events")
+            criteria_met.append("Moderate event activity (2+/5)")
+        
+        # Rating quality
+        avg_rating = self.get_average_rating()
+        if avg_rating and avg_rating >= 4.5:
+            reasons.append("Consistently receives excellent reviews")
+            criteria_met.append("Excellent ratings (4.5+/5)")
+        elif avg_rating and avg_rating >= 4.0:
+            reasons.append("Well-regarded by visitors")
+            criteria_met.append("Good ratings (4.0+/5)")
+        elif avg_rating and avg_rating >= 3.5:
+            reasons.append("Generally positive visitor feedback")
+            criteria_met.append("Decent ratings (3.5+/5)")
+        
+        # Category-specific reasons
+        if self.category:
+            category_benefits = {
+                1: "Perfect for peaceful nature experiences and seasonal beauty",  # Botanical Gardens
+                2: "Ideal for wildlife observation and nature education",  # Bird Watching
+                3: "Great for cultural enrichment and learning",  # Museums
+                4: "Excellent for marine life education and family fun",  # Aquariums
+                5: "Convenient for accessible shopping and errands",  # Shopping Centers
+                6: "Perfect for discovering unique treasures and collectibles",  # Antique Shops
+                7: "Inspiring for art appreciation and creative experiences",  # Art Galleries
+                8: "Valuable for research, reading, and community programs",  # Libraries
+                9: "Entertainment venue with accessible seating options",  # Theaters
+                10: "Great for creative projects and skill development",  # Craft Stores
+                11: "Perfect for gardening inspiration and plant selection",  # Garden Centers
+                12: "Stunning displays of exotic plants and peaceful atmosphere"  # Conservatories
+            }
+            
+            if self.category_id in category_benefits:
+                reasons.append(category_benefits[self.category_id])
+        
+        # Compile the summary
+        if not reasons:
+            summary = "This venue meets basic accessibility standards and provides a standard experience."
+        else:
+            summary = ". ".join(reasons) + "."
+        
+        return {
+            'summary': summary,
+            'criteria_met': criteria_met,
+            'accessibility_score': round(accessibility_score, 1),
+            'interestingness_score': float(self.interestingness_score) if self.interestingness_score else 0.0,
+            'average_rating': avg_rating,
+            'total_criteria': len(criteria_met)
+        }
+    
     def __repr__(self):
         return f'<Venue {self.name}>'

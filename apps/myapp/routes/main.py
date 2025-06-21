@@ -141,6 +141,9 @@ def venue_detail(venue_id):
     # Get recent reviews
     recent_reviews = UserReview.get_venue_reviews(venue_id, 5)
     
+    # Get reason for inclusion
+    reason_for_inclusion = venue.get_reason_for_inclusion()
+    
     return render_template('venue_detail.html',
                          venue=venue,
                          accessibility_summary=accessibility_summary,
@@ -148,7 +151,8 @@ def venue_detail(venue_id):
                          similar_venues=similar_venues,
                          is_favorited=is_favorited,
                          user_review=user_review,
-                         recent_reviews=recent_reviews)
+                         recent_reviews=recent_reviews,
+                         reason_for_inclusion=reason_for_inclusion)
 
 @main_bp.route('/favorites')
 @login_required

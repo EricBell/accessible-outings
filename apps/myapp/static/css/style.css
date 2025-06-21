@@ -1,405 +1,47 @@
-/* Custom styles for Accessible Outings Finder */
-
-:root {
-    --primary-color: #0d6efd;
-    --secondary-color: #6c757d;
-    --success-color: #198754;
-    --warning-color: #ffc107;
-    --danger-color: #dc3545;
-    --info-color: #0dcaf0;
-    --light-color: #f8f9fa;
-    --dark-color: #212529;
-    --accessibility-green: #28a745;
-    --accessibility-orange: #fd7e14;
-    --accessibility-red: #dc3545;
-}
-
-/* General Styles */
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-}
-
-/* Accessibility Improvements */
-.btn:focus,
-.form-control:focus,
-.form-select:focus {
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-    border-color: var(--primary-color);
-}
-
-/* Skip to main content link for screen readers */
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 6px;
-    background: var(--dark-color);
-    color: white;
-    padding: 8px;
-    text-decoration: none;
-    z-index: 1000;
-}
-
-.skip-link:focus {
-    top: 6px;
-}
-
-/* Category Cards */
-.category-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    border: 1px solid #dee2e6;
-}
-
-.category-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-color: var(--primary-color);
-}
-
-/* Venue Cards */
-.venue-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    border: 1px solid #dee2e6;
-    height: 100%;
-}
-
-.venue-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-/* Accessibility Score Badges */
-.accessibility-score {
-    font-weight: bold;
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-}
-
-.accessibility-excellent {
-    background-color: var(--accessibility-green);
-    color: white;
-}
-
-.accessibility-good {
-    background-color: var(--info-color);
-    color: white;
-}
-
-.accessibility-fair {
-    background-color: var(--warning-color);
-    color: var(--dark-color);
-}
-
-.accessibility-limited {
-    background-color: var(--accessibility-red);
-    color: white;
-}
-
-/* Accessibility Features List */
-.accessibility-features {
-    list-style: none;
-    padding: 0;
-}
-
-.accessibility-features li {
-    padding: 0.25rem 0;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.accessibility-features li:last-child {
-    border-bottom: none;
-}
-
-.accessibility-features .feature-icon {
-    color: var(--accessibility-green);
-    margin-right: 0.5rem;
-}
-
-/* Rating Stars */
-.rating-stars {
-    color: #ffc107;
-}
-
-.rating-stars .empty {
-    color: #e9ecef;
-}
-
-/* Distance Badge */
-.distance-badge {
-    background-color: var(--light-color);
-    color: var(--dark-color);
-    border: 1px solid #dee2e6;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-}
-
-/* Favorite Button */
-.favorite-btn {
-    border: none;
-    background: none;
-    color: #6c757d;
-    font-size: 1.25rem;
-    transition: color 0.2s ease-in-out;
-}
-
-.favorite-btn:hover {
-    color: #dc3545;
-}
-
-.favorite-btn.favorited {
-    color: #dc3545;
-}
-
-/* Search Results */
-.search-results-header {
-    background-color: var(--light-color);
-    border-radius: 0.375rem;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-/* Venue Detail Page */
-.venue-header {
-    background: linear-gradient(135deg, var(--primary-color), #0056b3);
-    color: white;
-    padding: 2rem 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.venue-photos {
-    max-height: 300px;
-    overflow: hidden;
-    border-radius: 0.375rem;
-}
-
-.venue-photos img {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-}
-
-/* Hours Display */
-.hours-list {
-    list-style: none;
-    padding: 0;
-}
-
-.hours-list li {
+/* Reason for Inclusion Section Styles */
+.rating-compact {
     display: flex;
-    justify-content: space-between;
-    padding: 0.25rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
-.hours-list li:last-child {
-    border-bottom: none;
+.stars-compact {
+    font-size: 0.8em;
+    margin-top: 2px;
 }
 
-.hours-today {
-    font-weight: bold;
-    background-color: #fff3cd;
-    padding: 0.5rem;
-    border-radius: 0.375rem;
+.stars-compact i {
+    margin-right: 1px;
 }
 
-/* Review Cards */
-.review-card {
-    border-left: 4px solid var(--primary-color);
+.score-summary {
     background-color: #f8f9fa;
-}
-
-.review-meta {
-    font-size: 0.875rem;
-    color: var(--secondary-color);
-}
-
-/* Form Enhancements */
-.form-floating > .form-control:focus ~ label,
-.form-floating > .form-control:not(:placeholder-shown) ~ label {
-    opacity: 0.65;
-    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
-}
-
-/* Loading States */
-.loading {
-    opacity: 0.6;
-    pointer-events: none;
-}
-
-.spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .display-4 {
-        font-size: 2rem;
-    }
-    
-    .venue-card {
-        margin-bottom: 1rem;
-    }
-    
-    .search-results-header {
-        text-align: center;
-    }
-    
-    .btn-group-vertical .btn {
-        margin-bottom: 0.5rem;
-    }
-}
-
-/* High Contrast Mode Support */
-@media (prefers-contrast: high) {
-    .card {
-        border: 2px solid var(--dark-color);
-    }
-    
-    .btn-outline-primary {
-        border-width: 2px;
-    }
-}
-
-/* Reduced Motion Support */
-@media (prefers-reduced-motion: reduce) {
-    .category-card,
-    .venue-card {
-        transition: none;
-    }
-    
-    .category-card:hover,
-    .venue-card:hover {
-        transform: none;
-    }
-}
-
-/* Print Styles */
-@media print {
-    .navbar,
-    .btn,
-    footer {
-        display: none !important;
-    }
-    
-    .container-fluid {
-        margin: 0;
-        padding: 0;
-    }
-    
-    .card {
-        border: 1px solid #000;
-        break-inside: avoid;
-    }
-}
-
-/* Custom Alert Styles */
-.alert-accessibility {
-    color: #0f5132;
-    background-color: #d1e7dd;
-    border-color: #badbcc;
-}
-
-/* Venue Status Indicators */
-.status-open {
-    color: var(--accessibility-green);
-}
-
-.status-closed {
-    color: var(--accessibility-red);
-}
-
-.status-unknown {
-    color: var(--secondary-color);
-}
-
-/* Accessibility Recommendations */
-.recommendation-list {
-    list-style: none;
-    padding: 0;
-}
-
-.recommendation-list li {
-    padding: 0.5rem;
-    margin-bottom: 0.5rem;
-    background-color: #fff3cd;
-    border-left: 4px solid var(--warning-color);
-    border-radius: 0.375rem;
-}
-
-/* Search Filters */
-.search-filters {
-    background-color: var(--light-color);
-    border-radius: 0.375rem;
     padding: 1rem;
-    margin-bottom: 1rem;
+    border-radius: 0.375rem;
+    border: 1px solid #dee2e6;
 }
 
-.filter-toggle {
-    cursor: pointer;
-    user-select: none;
+.score-item {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
 }
 
-/* Venue Grid */
-.venue-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
+.score-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
-@media (max-width: 576px) {
-    .venue-grid {
-        grid-template-columns: 1fr;
-    }
+.criteria-met {
+    background-color: #f8fff9;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    border-left: 4px solid #28a745;
+    margin-top: 1rem;
 }
 
-/* Error States */
-.error-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--secondary-color);
-}
-
-.error-state i {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    opacity: 0.5;
-}
-
-/* Success States */
-.success-state {
-    text-align: center;
-    padding: 2rem 1rem;
-    color: var(--accessibility-green);
-}
-
-/* Loading Skeleton */
-.skeleton {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 200% 100%;
-    animation: loading 1.5s infinite;
-}
-
-@keyframes loading {
-    0% {
-        background-position: 200% 0;
-    }
-    100% {
-        background-position: -200% 0;
-    }
-}
-
-.skeleton-text {
-    height: 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 0.25rem;
-}
-
-.skeleton-title {
-    height: 1.5rem;
-    width: 60%;
-    margin-bottom: 1rem;
-    border-radius: 0.25rem;
+/* Experience Tags Styling */
+.badge.badge-outline-primary {
+    background-color: transparent;
+    border: 1px solid #007bff;
+    color: #007bff;
 }
