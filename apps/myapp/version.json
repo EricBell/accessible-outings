@@ -2,10 +2,11 @@
   "version": [
     0,
     2,
-    10
+    11
   ],
   "file_hashes": {
     "/mnt/d/etc/workspaces/playground/dataannotation/accessible-outings/templates/base.html": "2953ea136e8077fc40815d6c21deb7d53c324c788346cb5e6791dcd11bfd6fdc",
-    "/mnt/c/Users/bookm/etc/workspace/playground/dataannotation/accessible-outings/apps/myapp/templates/base.html": "a4717a740ba6cec9e3d4c214a8a95957b74d75be2cef95f7e1f15aafd7c0a902"
+    "/mnt/c/Users/bookm/etc/workspace/playground/dataannotation/accessible-outings/apps/myapp/templates/base.html": "a4717a740ba6cec9e3d4c214a8a95957b74d75be2cef95f7e1f15aafd7c0a902",
+    "/mnt/d/etc/workspaces/playground/dataannotation/accessible-outings/apps/myapp/templates/base.html": "845a101ee3c83511ca565cf050dba2c1c61e2d63db5f5534dc66aeaae460fd52"
   }
 }

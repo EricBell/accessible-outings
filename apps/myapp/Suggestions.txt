@@ -675,6 +675,97 @@ Perfect! I've successfully implemented the admin system. Here's what I've create
 
   This will ensure your database schema is synchronized across environments and the admin functionality is properly configured.
 
+
+
+
+  ● Based on my analysis, here are the venue categorization tools available in your application:
+
+  Main Categorization Tools
+
+  1. Admin Dashboard (/admin)
+
+  - Web interface showing categorized vs uncategorized venues
+  - Category statistics with accessibility breakdowns
+  - Progress monitoring for categorization completion
+
+  2. Automated Categorization Scripts
+
+  - update_venue_categories.py - Main categorization script using Google Places API
+  - fix_categories.py - Direct database categorization using keyword matching
+  - reset_categories.py - Utility to clear all categories for fresh start
+
+  3. Category Management System
+
+  - 12 predefined categories: Botanical Gardens, Bird Watching, Museums, Aquariums, Shopping Centers, Antique Shops, Art Galleries, Libraries, Theaters, Craft Stores, Garden Centers,
+  Conservatories
+  - Google Places integration for intelligent type mapping
+  - Experience tagging system that adds tags based on category
+
+  4. Web Interface Tools
+
+  - /categories - Browse venues by category
+  - Category filtering in search results
+  - API endpoints for category data (/api/categories)
+
+  5. Debugging & Utilities
+
+  - debug_venues.py - Inspect current categorization status
+  - Database migration tools for schema updates
+  - Statistics reporting for categorization progress
+
+  How to Use
+
+  For bulk categorization:
+  python update_venue_categories.py        # Auto-categorize using Google API
+  python update_venue_categories.py stats  # Show categorization statistics
+  python fix_categories.py                 # Keyword-based categorization
+
+  For monitoring:
+  - Visit /admin dashboard to see categorization progress
+  - Use python debug_venues.py for detailed venue inspection
+
+  The system uses both Google Places API data and keyword matching to automatically assign venues to the 12 accessibility-focused categories.
+
+
+● You can see the categorization for Hobby Lobby in several places in the app:
+
+  1. Admin Dashboard (/admin)
+
+  - Shows category statistics including "Craft Stores" (category 10) count
+  - Lists top venues by interestingness score
+
+  2. Categories Page (/categories)
+
+  - Browse all categories and see venues in each
+  - Click on "Craft Stores" to see Hobby Lobby listed
+
+  3. Category-Specific Page (/category/10)
+
+  - Direct link to see all "Craft Stores" venues including Hobby Lobby
+  - Shows venues sorted by accessibility score
+
+  4. Search Results
+
+  - When searching, venues now show their category
+  - Hobby Lobby will display as "Craft Stores" category
+
+  5. Venue Detail Page
+
+  - Individual venue pages show the assigned category
+  - Visit the specific Hobby Lobby venue page to see "Craft Stores" listed
+
+  Quick Check
+
+  To verify the categorization worked:
+
+  1. Go to /admin - Look for "Craft Stores" in the category statistics
+  2. Go to /categories - Click on "Craft Stores" to see Hobby Lobby
+  3. Search for venues - Hobby Lobby should now show its category in results
+
+  The categorization assigns Hobby Lobby to category 10 ("Craft Stores"), which makes sense since Hobby Lobby is a craft and hobby supply store. You should now see it properly categorized
+   throughout the application interface.
+
+
 250619 add new categories
 1. create a way to try and discover new categories. 
 2. Category editor. Add/edit/delete categories.
@@ -683,3 +774,6 @@ Perfect! I've successfully implemented the admin system. Here's what I've create
 5. looking at categories and there are 0 venue for e.g. bird watching, add a Find Nearest feature 
    to search and locate one or more. 
 6. Pull out the 'theme' so this can be reskined.
+7. admin dashboard = under cat breakdown, click on "craftstores" shows me lists of the venues. Each row is the venue name and it's a link to the detail page.
+
+
