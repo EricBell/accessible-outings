@@ -1179,6 +1179,66 @@ Perfect! I've successfully implemented the admin system. Here's what I've create
   perfectly now.
 
 
+● Perfect! I've successfully organized all the scripts into appropriate folders. Here's what I
+  accomplished:
+
+  ✅ Script Organization Complete
+
+  Created Folders:
+
+  - admin-tools/ - For production admin and data management scripts
+  - debug-tools/ - For debugging, testing, and development scripts
+
+  Admin Tools (17 scripts):
+
+  User Management:
+  - Admin user creation, password fixes, and verification scripts
+
+  Data Management:
+  - Event creation, venue data fixes, category management, and database migrations
+
+  Debug Tools (21 scripts):
+
+  Authentication Debug:
+  - Comprehensive auth debugging and testing tools
+
+  System Testing:
+  - Unit tests, comprehensive tests, and validation tools
+
+  Audit & Validation:
+  - Data integrity checks and system health validation
+
+  Remaining in Main Directory (5 scripts):
+
+  - app.py - Main Flask application
+  - config.py - Configuration management
+  - version.py - Version information
+  - add_experience_columns.py - Schema modification
+  - monitor_data_integrity.py - Runtime monitoring
+
+  Documentation:
+
+  - Created detailed README.md files in both folders
+  - Included usage instructions and script descriptions
+  - Organized scripts by functionality
+
+  Benefits:
+
+  1. Clean main directory - Only essential application files remain
+  2. Clear separation - Admin vs debug tools are organized
+  3. Easy navigation - README files provide guidance
+  4. Better maintenance - Related scripts are grouped together
+
+  To use any script now:
+  # Admin tasks
+  cd admin-tools && python create_sample_events.py
+
+  # Debug tasks  
+  cd debug-tools && python debug_login_flow.py
+
+  The main application directory is now much cleaner and more professional!
+
+
 
 250619 add new categories
 1. create a way to try and discover new categories. 
