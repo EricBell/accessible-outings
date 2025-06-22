@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+
+{% block title %}Event Search Results - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Search Results Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="mb-1">
+                        <i class="fas fa-calendar-alt me-2"></i>Event Search Results
+                    </h2>
+                    <p class="text-muted mb-0">
+                        Found {{ total_results }} events near {{ location_name }}
+                        {% if search_params.category_id and category %}
+                            in {{ category.name }}
+                        {% endif %}
+                    </p>
+                </div>
+                <a href="{{ url_for('main.index') }}" class="btn btn-outline-primary">
+                    <i class="fas fa-search me-1"></i>New Search
+                </a>
+            </div>
+            
+            <!-- Search Summary -->
+            <div class="card bg-light">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex flex-wrap gap-3">
+                                <span><strong>Location:</strong> {{ search_params.zip_code }} ({{ search_params.radius }} miles)</span>
+                                {% if search_params.category_id and category %}
+                                <span><strong>Category:</strong> {{ category.name }}</span>
+                                {% endif %}
+                                {% if search_params.event_types %}
+                                <span><strong>Types:</strong> {{ search_params.event_types|join(', ')|title }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <span class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ search_params.start_date }} to {{ search_params.end_date }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if events %}
+    <!-- Events List -->
+    <div class="row">
+        {% for event in events %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100 event-card">
+                {% if event.image_url %}
+                <img src="{{ event.image_url }}" class="card-img-top" alt="{{ event.title }}" style="height: 200px; object-fit: cover;">
+                {% endif %}
+                
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-auto">
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        
+                        <!-- Venue Info -->
+                        <div class="venue-info mb-3">
+                            <p class="card-text text-muted mb-1">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                <a href="{{ url_for('main.venue_detail', venue_id=event.venue.id) }}" 
+                                   class="text-decoration-none">
+                                    {{ event.venue.name }}
+                                </a>
+                            </p>
+                            {% if event.venue.address %}
+                            <p class="card-text small text-muted mb-2">{{ event.venue.address }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Event Details -->
+                        <div class="event-details mb-3">
+                            <p class="card-text mb-1">
+                                <i class="fas fa-calendar me-1"></i>{{ event.get_date_display() }}
+                            </p>
+                            <p class="card-text mb-1">
+                                <i class="fas fa-clock me-1"></i>{{ event.get_time_display() }}
+                            </p>
+                            {% if event.duration_hours %}
+                            <p class="card-text mb-1">
+                                <i class="fas fa-hourglass-half me-1"></i>{{ event.get_duration_display() }}
+                            </p>
+                            {% endif %}
+                            {% if event.cost %}
+                            <p class="card-text mb-1">
+                                <i class="fas fa-dollar-sign me-1"></i>{{ event.cost }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Event Types -->
+                        <div class="event-types mb-3">
+                            {% for event_type in event.get_event_types() %}
+                            <span class="badge me-1 
+                                {% if event_type == 'Fun' %}bg-success
+                                {% elif event_type == 'Interesting' %}bg-info
+                                {% elif event_type == 'Off-beat' %}bg-warning text-dark
+                                {% else %}bg-secondary
+                                {% endif %}">
+                                {{ event_type }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                        
+                        <!-- Description -->
+                        {% if event.description %}
+                        <p class="card-text">{{ event.description[:150] }}{% if event.description|length > 150 %}...{% endif %}</p>
+                        {% endif %}
+                        
+                        <!-- Accessibility Info -->
+                        <div class="accessibility-info mb-3">
+                            {% if event.wheelchair_accessible %}
+                            <span class="badge bg-primary">
+                                <i class="fas fa-wheelchair me-1"></i>Wheelchair Accessible
+                            </span>
+                            {% endif %}
+                            {% if event.hearing_accessible %}
+                            <span class="badge bg-primary">
+                                <i class="fas fa-assistive-listening-systems me-1"></i>Hearing Accessible
+                            </span>
+                            {% endif %}
+                            {% if event.vision_accessible %}
+                            <span class="badge bg-primary">
+                                <i class="fas fa-low-vision me-1"></i>Vision Accessible
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="card-actions pt-3 mt-auto">
+                        <div class="row g-2">
+                            <div class="col">
+                                <a href="{{ url_for('main.event_detail', event_id=event.id) }}" 
+                                   class="btn btn-primary btn-sm w-100">
+                                    <i class="fas fa-info-circle me-1"></i>View Details
+                                </a>
+                            </div>
+                            {% if event.registration_url %}
+                            <div class="col">
+                                <a href="{{ event.registration_url }}" 
+                                   target="_blank" 
+                                   class="btn btn-outline-success btn-sm w-100">
+                                    <i class="fas fa-external-link-alt me-1"></i>Register
+                                </a>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination would go here if needed -->
+    
+    {% else %}
+    <!-- No Results -->
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-4x text-muted mb-4"></i>
+                <h3 class="text-muted mb-3">No Events Found</h3>
+                <p class="text-muted mb-4">
+                    We couldn't find any events matching your criteria in this area.
+                </p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i>Try Different Search
+                    </a>
+                    <a href="{{ url_for('main.categories') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-th-large me-1"></i>Browse Categories
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Search Tips -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-lightbulb me-2"></i>Search Tips
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Try expanding your search radius</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Select different event types</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Browse all categories for more options</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled mb-0">
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Check back regularly for new events</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Try nearby ZIP codes</li>
+                                <li class="mb-1"><i class="fas fa-check text-success me-2"></i>Consider events in different date ranges</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.event-card {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.event-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.venue-info a:hover {
+    text-decoration: underline !important;
+}
+
+.accessibility-info .badge {
+    font-size: 0.7em;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.event-types .badge {
+    font-size: 0.75em;
+}
+
+.card-actions {
+    border-top: 1px solid #dee2e6;
+}
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click tracking for events
+    document.querySelectorAll('.event-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Don't trigger if clicking on buttons or links
+            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || 
+                e.target.closest('a') || e.target.closest('button')) {
+                return;
+            }
+            
+            // Find the details link and click it
+            const detailsLink = card.querySelector('a[href*="event_detail"]');
+            if (detailsLink) {
+                detailsLink.click();
+            }
+        });
+        
+        // Add cursor pointer to indicate clickability
+        card.style.cursor = 'pointer';
+    });
+});
+</script>
+{% endblock %}

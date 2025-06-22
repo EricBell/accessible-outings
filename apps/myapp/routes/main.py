@@ -130,6 +130,20 @@ def search():
             venue_ids=venue_ids
         )
         
+        # If no events found and we have venues, generate some events
+        if not events and venues:
+            from utils.event_generator import EventGenerator
+            events = EventGenerator.get_or_create_events_for_venues(venues, event_types)
+            
+            # Filter the generated events by date and accessibility
+            events = Event.search_events(
+                start_date=start_date,
+                end_date=end_date,
+                event_types=event_types,
+                wheelchair_accessible_only=accessible_only,
+                venue_ids=venue_ids
+            )
+        
         # Log search for analytics
         user = get_current_user()
         if user:

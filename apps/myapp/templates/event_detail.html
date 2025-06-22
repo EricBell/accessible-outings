@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Back Button -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>Back to Results
+            </a>
+        </div>
+    </div>
+
+    <!-- Event Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h1 class="card-title">{{ event.title }}</h1>
+                            
+                            <!-- Event Types -->
+                            <div class="mb-3">
+                                {% for event_type in event.get_event_types() %}
+                                <span class="badge me-1 
+                                    {% if event_type == 'Fun' %}bg-success
+                                    {% elif event_type == 'Interesting' %}bg-info
+                                    {% elif event_type == 'Off-beat' %}bg-warning text-dark
+                                    {% else %}bg-secondary
+                                    {% endif %}">
+                                    {{ event_type }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            
+                            <!-- Venue Link -->
+                            <p class="card-text">
+                                <i class="fas fa-map-marker-alt me-2"></i>
+                                <a href="{{ url_for('main.venue_detail', venue_id=event.venue.id) }}" 
+                                   class="text-decoration-none">
+                                    <strong>{{ event.venue.name }}</strong>
+                                </a>
+                            </p>
+                            
+                            {% if event.venue.address %}
+                            <p class="text-muted">{{ event.venue.address }}</p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 text-md-end">
+                            {% if event.registration_required %}
+                            <div class="d-grid gap-2">
+                                {% if event.registration_url %}
+                                <a href="{{ event.registration_url }}" target="_blank" 
+                                   class="btn btn-success btn-lg">
+                                    <i class="fas fa-external-link-alt me-1"></i>Register Now
+                                </a>
+                                {% else %}
+                                <button class="btn btn-success btn-lg" disabled>
+                                    <i class="fas fa-phone me-1"></i>Call to Register
+                                </button>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Details -->
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Description -->
+            {% if event.description %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>About This Event</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ event.description }}</p>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Accessibility Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-wheelchair me-2"></i>Accessibility</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-wheelchair me-2 text-{% if event.wheelchair_accessible %}success{% else %}muted{% endif %}"></i>
+                                <span>Wheelchair Accessible: 
+                                    <strong class="text-{% if event.wheelchair_accessible %}success{% else %}muted{% endif %}">
+                                        {% if event.wheelchair_accessible %}Yes{% else %}Not specified{% endif %}
+                                    </strong>
+                                </span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-assistive-listening-systems me-2 text-{% if event.hearing_accessible %}success{% else %}muted{% endif %}"></i>
+                                <span>Hearing Accessible: 
+                                    <strong class="text-{% if event.hearing_accessible %}success{% else %}muted{% endif %}">
+                                        {% if event.hearing_accessible %}Yes{% else %}Not specified{% endif %}
+                                    </strong>
+                                </span>
+                            </div>
+                            
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-low-vision me-2 text-{% if event.vision_accessible %}success{% else %}muted{% endif %}"></i>
+                                <span>Vision Accessible: 
+                                    <strong class="text-{% if event.vision_accessible %}success{% else %}muted{% endif %}">
+                                        {% if event.vision_accessible %}Yes{% else %}Not specified{% endif %}
+                                    </strong>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            {% if event.accessibility_notes %}
+                            <div class="alert alert-info">
+                                <strong>Accessibility Notes:</strong><br>
+                                {{ event.accessibility_notes }}
+                            </div>
+                            {% endif %}
+                            
+                            {% if event.mobility_accommodations %}
+                            <div class="alert alert-info">
+                                <strong>Mobility Accommodations:</strong><br>
+                                {{ event.mobility_accommodations }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Event Sidebar -->
+        <div class="col-md-4">
+            <!-- Event Details Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Event Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="detail-item mb-3">
+                        <strong><i class="fas fa-calendar me-2"></i>Date:</strong><br>
+                        {{ event.get_date_display() }}
+                    </div>
+                    
+                    <div class="detail-item mb-3">
+                        <strong><i class="fas fa-clock me-2"></i>Time:</strong><br>
+                        {{ event.get_time_display() }}
+                    </div>
+                    
+                    {% if event.duration_hours %}
+                    <div class="detail-item mb-3">
+                        <strong><i class="fas fa-hourglass-half me-2"></i>Duration:</strong><br>
+                        {{ event.get_duration_display() }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if event.cost %}
+                    <div class="detail-item mb-3">
+                        <strong><i class="fas fa-dollar-sign me-2"></i>Cost:</strong><br>
+                        {{ event.cost }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if event.age_restriction %}
+                    <div class="detail-item mb-3">
+                        <strong><i class="fas fa-users me-2"></i>Age Requirement:</strong><br>
+                        {{ event.age_restriction }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if event.max_participants %}
+                    <div class="detail-item mb-3">
+                        <strong><i class="fas fa-user-friends me-2"></i>Max Participants:</strong><br>
+                        {{ event.max_participants }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if event.indoor_outdoor %}
+                    <div class="detail-item mb-3">
+                        <strong><i class="fas fa-home me-2"></i>Location Type:</strong><br>
+                        {{ event.indoor_outdoor }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if event.weather_dependent %}
+                    <div class="detail-item mb-3">
+                        <div class="alert alert-warning small mb-0">
+                            <i class="fas fa-cloud-rain me-1"></i>
+                            This event is weather dependent
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            {% if event.contact_phone or event.contact_email %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-phone me-2"></i>Contact</h5>
+                </div>
+                <div class="card-body">
+                    {% if event.contact_phone %}
+                    <div class="detail-item mb-2">
+                        <strong>Phone:</strong><br>
+                        <a href="tel:{{ event.contact_phone }}">{{ event.contact_phone }}</a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if event.contact_email %}
+                    <div class="detail-item mb-2">
+                        <strong>Email:</strong><br>
+                        <a href="mailto:{{ event.contact_email }}">{{ event.contact_email }}</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- What to Bring / Provided -->
+            {% if event.bring_items or event.provided_items %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-list me-2"></i>Preparation</h5>
+                </div>
+                <div class="card-body">
+                    {% if event.bring_items %}
+                    <div class="detail-item mb-3">
+                        <strong>Please Bring:</strong><br>
+                        {{ event.bring_items }}
+                    </div>
+                    {% endif %}
+                    
+                    {% if event.provided_items %}
+                    <div class="detail-item mb-3">
+                        <strong>Provided:</strong><br>
+                        {{ event.provided_items }}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.detail-item {
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+</style>
+{% endblock %}
