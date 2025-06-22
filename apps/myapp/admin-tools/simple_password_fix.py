@@ -29,7 +29,7 @@ def fix_admin_password():
     password_hash = create_werkzeug_compatible_hash(password)
     
     # Update database
-    conn = sqlite3.connect('instance/accessible_outings.db')
+    conn = sqlite3.connect('../instance/accessible_outings.db')
     cursor = conn.cursor()
     
     # Check if admin user exists

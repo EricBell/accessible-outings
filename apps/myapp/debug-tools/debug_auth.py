@@ -36,7 +36,7 @@ def check_werkzeug_password(password_hash, password):
 
 def debug_authentication():
     """Debug the authentication issue."""
-    conn = sqlite3.connect('instance/accessible_outings.db')
+    conn = sqlite3.connect('../instance/accessible_outings.db')
     cursor = conn.cursor()
     
     # Get admin user details

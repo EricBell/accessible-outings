@@ -45,7 +45,7 @@ def check_werkzeug_password(password_hash, password):
 
 def authenticate(username_or_email, password):
     """Exact replica of User.authenticate method."""
-    conn = sqlite3.connect('instance/accessible_outings.db')
+    conn = sqlite3.connect('../instance/accessible_outings.db')
     cursor = conn.cursor()
     
     # This is the exact query from the User model

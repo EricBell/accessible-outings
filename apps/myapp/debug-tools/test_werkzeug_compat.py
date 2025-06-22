@@ -11,7 +11,7 @@ def test_werkzeug_compatibility():
         from werkzeug.security import check_password_hash
         
         # Get the admin user's password hash
-        conn = sqlite3.connect('instance/accessible_outings.db')
+        conn = sqlite3.connect('../instance/accessible_outings.db')
         cursor = conn.cursor()
         cursor.execute("SELECT password_hash FROM users WHERE username = 'admin'")
         result = cursor.fetchone()
@@ -37,7 +37,7 @@ def test_werkzeug_compatibility():
                 print(f"New Werkzeug hash: {new_hash}")
                 
                 # Update database with Werkzeug-generated hash
-                conn = sqlite3.connect('instance/accessible_outings.db')
+                conn = sqlite3.connect('../instance/accessible_outings.db')
                 cursor = conn.cursor()
                 cursor.execute("UPDATE users SET password_hash = ? WHERE username = 'admin'", (new_hash,))
                 conn.commit()

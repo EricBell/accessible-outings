@@ -28,7 +28,7 @@ def create_clean_admin():
     print(f"Generated password hash: {password_hash}")
     
     # Connect to database
-    conn = sqlite3.connect('instance/accessible_outings.db')
+    conn = sqlite3.connect('../instance/accessible_outings.db')
     cursor = conn.cursor()
     
     # Delete any existing admin users

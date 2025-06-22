@@ -31,6 +31,8 @@ cd admin-tools
 python script_name.py
 ```
 
+**Note:** All scripts automatically reference the database at `../instance/accessible_outings.db` relative to the admin-tools directory.
+
 **Warning:** These scripts modify production data. Use with caution in production environments.
 
 ## Common Admin Tasks

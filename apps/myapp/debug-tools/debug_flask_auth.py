@@ -57,7 +57,7 @@ def simulate_flask_auth():
     print()
     
     # Step 2: Database query (simulating User.authenticate)
-    conn = sqlite3.connect('instance/accessible_outings.db')
+    conn = sqlite3.connect('../instance/accessible_outings.db')
     cursor = conn.cursor()
     
     print(f"2. Database Query:")

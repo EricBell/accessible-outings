@@ -14,7 +14,7 @@ def simple_hash_password(password):
 
 def add_admin_column_and_user():
     """Add admin column to users table and create admin user."""
-    db_path = 'instance/accessible_outings.db'
+    db_path = '../instance/accessible_outings.db'
     
     if not os.path.exists(db_path):
         print(f"Database not found at {db_path}")

@@ -116,7 +116,7 @@ def calculate_event_frequency_score(category_id, experience_tags):
 
 def update_venue_experiences():
     """Update all venues with experience data."""
-    db_path = 'instance/accessible_outings.db'
+    db_path = '../instance/accessible_outings.db'
     
     if not os.path.exists(db_path):
         print(f"Database not found at {db_path}")

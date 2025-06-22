@@ -32,7 +32,7 @@ def final_admin_fix():
     print(f"New password hash: {password_hash}")
     
     # 2. Update the database
-    conn = sqlite3.connect('instance/accessible_outings.db')
+    conn = sqlite3.connect('../instance/accessible_outings.db')
     cursor = conn.cursor()
     
     # Check current admin user

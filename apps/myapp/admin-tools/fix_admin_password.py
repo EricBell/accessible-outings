@@ -62,7 +62,7 @@ def fix_admin_password():
             from werkzeug.security import generate_password_hash
             
             password_hash = generate_password_hash('password')
-            conn = sqlite3.connect('instance/accessible_outings.db')
+            conn = sqlite3.connect('../instance/accessible_outings.db')
             cursor = conn.cursor()
             cursor.execute("UPDATE users SET password_hash = ? WHERE username = 'admin'", (password_hash,))
             conn.commit()

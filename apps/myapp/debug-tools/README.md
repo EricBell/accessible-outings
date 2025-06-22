@@ -41,6 +41,8 @@ cd debug-tools
 python script_name.py
 ```
 
+**Note:** All scripts automatically reference the database at `../instance/accessible_outings.db` relative to the debug-tools directory.
+
 ## Common Debug Tasks
 
 ### Debug Login Issues

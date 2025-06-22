@@ -7,7 +7,7 @@ import sqlite3
 
 def check_schema():
     """Check the users table schema."""
-    conn = sqlite3.connect('instance/accessible_outings.db')
+    conn = sqlite3.connect('../instance/accessible_outings.db')
     cursor = conn.cursor()
     
     # Get table schema

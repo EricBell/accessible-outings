@@ -8,7 +8,7 @@ import os
 
 def check_venues():
     """Check venue data directly from SQLite database."""
-    db_path = 'instance/accessible_outings.db'
+    db_path = '../instance/accessible_outings.db'
     
     if not os.path.exists(db_path):
         print(f"Database not found at {db_path}")

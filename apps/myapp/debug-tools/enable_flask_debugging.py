@@ -161,8 +161,8 @@ def show_debug_info():
     
     # Check database
     print("\\n📊 DATABASE STATUS:")
-    if os.path.exists('instance/accessible_outings.db'):
-        conn = sqlite3.connect('instance/accessible_outings.db')
+    if os.path.exists('../instance/accessible_outings.db'):
+        conn = sqlite3.connect('../instance/accessible_outings.db')
         cursor = conn.cursor()
         
         cursor.execute("SELECT COUNT(*) FROM users")

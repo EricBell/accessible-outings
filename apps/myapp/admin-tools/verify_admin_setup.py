@@ -8,7 +8,7 @@ import os
 
 def verify_admin_setup():
     """Check admin user configuration."""
-    db_path = 'instance/accessible_outings.db'
+    db_path = '../instance/accessible_outings.db'
     
     if not os.path.exists(db_path):
         print("Database does not exist!")

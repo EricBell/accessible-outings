@@ -17,7 +17,7 @@ from datetime import datetime
 def get_db_path():
     """Get the database file path."""
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    return os.path.join(base_dir, 'instance', 'accessible_outings.db')
+    return os.path.join(base_dir, '..', 'instance', 'accessible_outings.db')
 
 def check_column_exists(cursor, table_name, column_name):
     """Check if a column exists in a table."""
