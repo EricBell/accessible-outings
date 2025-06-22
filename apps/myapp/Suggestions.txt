@@ -973,6 +973,35 @@ Perfect! I've successfully implemented the admin system. Here's what I've create
   The admin system is now completely clean and should work. Try the login again with the
   fresh setup!
 
+● Perfect! I've successfully implemented the feature to control which event type checkboxes are checked by default
+  through environment variables. Here's a summary of what I did:
+
+  Changes Made:
+
+  1. Added environment variables to .env:
+    - DEFAULT_EVENT_TYPE_FUN=True
+    - DEFAULT_EVENT_TYPE_INTERESTING=True
+    - DEFAULT_EVENT_TYPE_OFF_BEAT=True
+  2. Updated config.py to read these environment variables and convert them to boolean values
+  3. Modified the index route in routes/main.py to pass these configuration values to the template
+  4. Updated templates/index.html to conditionally add the checked attribute to each checkbox based on the
+  configuration values
+
+  How to Use:
+
+  You can now control which checkboxes are checked by default by modifying the values in the .env file:
+
+  - Set to True (or true) to have the checkbox checked by default
+  - Set to False (or false) to have the checkbox unchecked by default
+  - If not specified, defaults to True
+
+  For example, to have only "Fun" and "Interesting" checked by default:
+  DEFAULT_EVENT_TYPE_FUN=True
+  DEFAULT_EVENT_TYPE_INTERESTING=True
+  DEFAULT_EVENT_TYPE_OFF_BEAT=False
+
+  The app will need to be restarted for changes to the .env file to take effect.
+
 
 
 250619 add new categories

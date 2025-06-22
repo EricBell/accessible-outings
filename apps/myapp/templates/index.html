@@ -94,7 +94,7 @@
                                 <div class="row g-2">
                                     <div class="col-auto">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="fun" name="event_types" value="fun">
+                                            <input class="form-check-input" type="checkbox" id="fun" name="event_types" value="fun"{% if default_event_type_fun %} checked{% endif %}>
                                             <label class="form-check-label" for="fun">
                                                 <i class="fas fa-smile me-1 text-success"></i>Fun
                                                 <small class="text-muted d-block">Hands-on activities, painting, crafts</small>
@@ -103,7 +103,7 @@
                                     </div>
                                     <div class="col-auto">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="interesting" name="event_types" value="interesting">
+                                            <input class="form-check-input" type="checkbox" id="interesting" name="event_types" value="interesting"{% if default_event_type_interesting %} checked{% endif %}>
                                             <label class="form-check-label" for="interesting">
                                                 <i class="fas fa-brain me-1 text-info"></i>Interesting
                                                 <small class="text-muted d-block">Lectures, workshops, learning</small>
@@ -112,7 +112,7 @@
                                     </div>
                                     <div class="col-auto">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="off_beat" name="event_types" value="off_beat">
+                                            <input class="form-check-input" type="checkbox" id="off_beat" name="event_types" value="off_beat"{% if default_event_type_off_beat %} checked{% endif %}>
                                             <label class="form-check-label" for="off_beat">
                                                 <i class="fas fa-eye me-1 text-warning"></i>Off-beat
                                                 <small class="text-muted d-block">Ghost tours, unique experiences</small>

@@ -64,6 +64,11 @@ class Config:
     LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO')
     LOG_FILE = os.environ.get('LOG_FILE', 'app.log')
     
+    # Default Event Type Checkboxes
+    DEFAULT_EVENT_TYPE_FUN = os.environ.get('DEFAULT_EVENT_TYPE_FUN', 'True').lower() == 'true'
+    DEFAULT_EVENT_TYPE_INTERESTING = os.environ.get('DEFAULT_EVENT_TYPE_INTERESTING', 'True').lower() == 'true'
+    DEFAULT_EVENT_TYPE_OFF_BEAT = os.environ.get('DEFAULT_EVENT_TYPE_OFF_BEAT', 'True').lower() == 'true'
+    
     # WTF Forms settings
     WTF_CSRF_ENABLED = False  # Disabled for development
     WTF_CSRF_TIME_LIMIT = 3600  # 1 hour

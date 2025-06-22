@@ -44,7 +44,10 @@ def index():
                          recent_searches=recent_searches,
                          todays_events=todays_events,
                          upcoming_events=upcoming_events,
-                         today_date=date.today().isoformat())
+                         today_date=date.today().isoformat(),
+                         default_event_type_fun=current_app.config.get('DEFAULT_EVENT_TYPE_FUN', True),
+                         default_event_type_interesting=current_app.config.get('DEFAULT_EVENT_TYPE_INTERESTING', True),
+                         default_event_type_off_beat=current_app.config.get('DEFAULT_EVENT_TYPE_OFF_BEAT', True))
 
 @main_bp.route('/search')
 def search():
