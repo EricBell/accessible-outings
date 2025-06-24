@@ -140,15 +140,18 @@ def search():
         
         # Log search for analytics
         user = get_current_user()
-        if user:
-            SearchHistory.log_search(
-                user_id=user.id,
-                search_zip=zip_code,
-                search_radius=radius,
-                category_filter=category_id,
-                results_count=len(events),
-                accessibility_filter=accessible_only
-            )
+        if user and hasattr(user, 'id') and user.id:
+            try:
+                SearchHistory.log_search(
+                    user_id=user.id,
+                    search_zip=zip_code,
+                    search_radius=radius,
+                    category_filter=category_id,
+                    results_count=len(events),
+                    accessibility_filter=accessible_only
+                )
+            except Exception as e:
+                current_app.logger.warning(f"Failed to log search history: {e}")
         
         # Get category info
         category = VenueCategory.query.get(category_id) if category_id else None

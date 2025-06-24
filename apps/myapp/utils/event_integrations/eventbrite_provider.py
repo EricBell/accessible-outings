@@ -60,6 +60,15 @@ class EventbriteProvider(BaseEventProvider):
             self.logger.info(f"Searching Eventbrite: {location}, {start_date} to {end_date}")
             
             response = self.session.get(url, params=params)
+            
+            # Check for specific error responses
+            if response.status_code == 404:
+                self.logger.error(f"Eventbrite API endpoint not found. Check API key and endpoint URL.")
+                return []
+            elif response.status_code == 401:
+                self.logger.error(f"Eventbrite API authentication failed. Check API key.")
+                return []
+            
             response.raise_for_status()
             
             data = response.json()
@@ -105,8 +114,14 @@ class EventbriteProvider(BaseEventProvider):
         try:
             url = f"{self.BASE_URL}/users/me/"
             response = self.session.get(url)
-            return response.status_code == 200
-        except:
+            if response.status_code == 200:
+                self.logger.info("Eventbrite API key validation successful")
+                return True
+            else:
+                self.logger.error(f"Eventbrite API key validation failed: {response.status_code} - {response.text}")
+                return False
+        except Exception as e:
+            self.logger.error(f"Eventbrite API key validation error: {e}")
             return False
     
     def _parse_event(self, event_data: Dict) -> Optional[EventData]:

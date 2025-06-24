@@ -289,7 +289,7 @@ class GooglePlacesAPI:
                 self.accessible_seating = accessibility_info.get('accessible_seating', False)
                 
                 # Mock reviews for analysis
-                self.reviews = type('MockRelation', (), {'count': lambda: 0})()
+                self.reviews = type('MockRelation', (), {'count': lambda self: 0})()
         
         # Extract accessibility info first (needed for temp venue)
         accessibility_info = self.extract_accessibility_info(place_data)

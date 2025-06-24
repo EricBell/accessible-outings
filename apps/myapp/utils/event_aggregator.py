@@ -232,8 +232,7 @@ class EventAggregator:
                 latitude=event_data.venue_latitude,
                 longitude=event_data.venue_longitude,
                 category_id=1,  # Default to Museums category
-                wheelchair_accessible=True,  # Default to accessible
-                source='api_event_venue'
+                wheelchair_accessible=True  # Default to accessible
             )
             
             db.session.add(venue)
