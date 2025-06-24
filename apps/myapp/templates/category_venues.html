@@ -46,10 +46,32 @@
                         {% endif %}
                     </div>
                     
-                    <p class="card-text text-muted small mb-2">
-                        <i class="fas fa-map-marker-alt me-1"></i>
-                        {{ venue.address }}
+                    <!-- Full Address -->
+                    {% if venue.address or venue.city or venue.state or venue.zip_code %}
+                    <p class="card-text text-muted small mb-1">
+                        <i class="fas fa-location-dot me-1"></i>
+                        {% if venue.address %}{{ venue.address }}{% endif %}
+                        {% if venue.city %}
+                            {% if venue.address %}, {% endif %}{{ venue.city }}
+                        {% endif %}
+                        {% if venue.state %}
+                            {% if venue.city or venue.address %}, {% endif %}{{ venue.state }}
+                        {% endif %}
+                        {% if venue.zip_code %}
+                            {% if venue.state or venue.city or venue.address %} {% endif %}{{ venue.zip_code }}
+                        {% endif %}
                     </p>
+                    {% endif %}
+                    
+                    <!-- Phone Number -->
+                    {% if venue.phone %}
+                    <p class="card-text text-muted small mb-2">
+                        <i class="fas fa-phone me-1"></i>
+                        <a href="tel:{{ venue.phone }}" class="text-decoration-none text-muted">
+                            {{ venue.phone }}
+                        </a>
+                    </p>
+                    {% endif %}
                     
                     <!-- Accessibility Features -->
                     <div class="accessibility-badges mb-3">

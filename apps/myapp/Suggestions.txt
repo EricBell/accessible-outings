@@ -1481,7 +1481,33 @@ Perfect! I've successfully implemented the admin system. Here's what I've create
   comprehensive venue contact information that appears on the search results page, making
   it easy to get the full address and contact the venue directly.
 
+● Excellent! I've successfully updated the category venues template to include full
+  address and phone number information.
 
+  ✅ Updated Category Page (/category/[id]):
+
+  What's now included:
+  1. Full Address: Complete address with street, city, state, and ZIP code properly
+  formatted with commas
+  2. Phone Number: Clickable phone number (tel: link) for easy calling on mobile
+  3. Consistent Icons:
+    - fa-location-dot for the full address
+    - fa-phone for the phone number
+  4. Smart Display: Only shows address/phone components that exist in the database
+  5. Proper Styling: Small text, muted color, maintains card layout
+
+  Layout in venue cards:
+  - Venue name at the top
+  - Full formatted address below the name
+  - Phone number below the address (if available)
+  - Accessibility badges
+  - Rating and distance info
+  - View Details button
+
+  Now when users browse venues by category (e.g., /category/1 for Museums), each venue
+  card will show complete contact information just like the search results and event
+  detail pages. This provides consistency across the entire application for venue contact
+  information display.
 
 
 250619 add new categories
