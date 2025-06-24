@@ -1509,6 +1509,51 @@ Perfect! I've successfully implemented the admin system. Here's what I've create
   detail pages. This provides consistency across the entire application for venue contact
   information display.
 
+● For VPS deployment, you'll need to run several scripts to set up the database and
+  configure the application. Let me create a deployment guide:
+
+● Write(DEPLOYMENT.md)
+  ⎿  Wrote 200 lines to DEPLOYMENT.md                                                     
+     # Deployment Guide for VPS
+     This guide covers the essential scripts and steps needed to deploy the Accessible
+     Outings app to a VPS.
+     ## Prerequisites
+     1. **Python 3.8+** installed on VPS
+     2. **PostgreSQL** database setup (recommended for production)
+     3. **Environment variables** configured
+     4. **API Keys** obtained and configured
+     … +190 lines (ctrl+r to expand)
+
+● 📋 VPS Deployment Scripts - Quick Reference
+
+  Essential Scripts (Run in this order):
+
+  1. admin-tools/db_migration.py - Creates all database tables and schema
+  2. admin-tools/update_events_schema.py - Adds Eventbrite API integration fields
+  3. admin-tools/create_admin_user.py - Creates admin user account
+  4. admin-tools/verify_admin_setup.py - Verifies admin login works
+
+  Quick deployment command sequence:
+  cd admin-tools
+  python db_migration.py
+  python update_events_schema.py
+  python create_admin_user.py
+  python verify_admin_setup.py
+
+  Key Configuration:
+  - Set up PostgreSQL database (recommended for production)
+  - Configure .env with your API keys and database URL
+  - Set FLASK_ENV=production and BYPASS_AUTH=False
+  - Use strong SECRET_KEY
+
+  Optional Scripts:
+  - reset_categories.py - Reset venue categories
+  - fix_categories.py - Update venue categorization
+  - reset_database_fresh.py - Clean slate (removes fake data)
+
+  I've created a comprehensive DEPLOYMENT.md file with all the details, troubleshooting
+  steps, and security considerations for your VPS deployment.
+
 
 250619 add new categories
 1. create a way to try and discover new categories. 
