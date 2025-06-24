@@ -66,6 +66,11 @@ class Event(db.Model):
     # Metadata
     source = db.Column(db.String(100))  # Where event info came from
     external_id = db.Column(db.String(255))  # ID from external source
+    source_api = db.Column(db.String(50))  # API source: 'eventbrite', 'meetup', etc.
+    external_event_id = db.Column(db.String(100))  # Original API event ID
+    last_verified = db.Column(db.DateTime)  # When event was last verified as still active
+    verification_status = db.Column(db.String(20), default='unverified')  # 'verified', 'expired', 'removed', 'unverified'
+    api_data = db.Column(db.JSON)  # Store raw API response for debugging
     last_updated = db.Column(db.DateTime, default=datetime.utcnow)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     is_recurring = db.Column(db.Boolean, default=False)

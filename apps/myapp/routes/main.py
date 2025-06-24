@@ -121,16 +121,22 @@ def search():
         # Get venue IDs for event filtering
         venue_ids = [venue.id for venue in venues] if venues else []
         
-        # Search for events
-        events = Event.search_events(
+        # Search for events using the new aggregator that includes external APIs
+        from utils.event_aggregator import EventAggregator
+        
+        aggregator = EventAggregator()
+        events = aggregator.search_and_sync_events(
+            location=zip_code,
             start_date=start_date,
             end_date=end_date,
             event_types=event_types,
-            wheelchair_accessible_only=accessible_only,
-            venue_ids=venue_ids
+            venue_ids=venue_ids if venues else None,
+            max_results=50
         )
         
-        # Only show real events - no fictional event generation
+        # Filter by accessibility if requested
+        if accessible_only:
+            events = [e for e in events if e.wheelchair_accessible]
         
         # Log search for analytics
         user = get_current_user()

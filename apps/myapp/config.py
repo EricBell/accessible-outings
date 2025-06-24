@@ -40,6 +40,7 @@ class Config:
     # API Keys
     GOOGLE_PLACES_API_KEY = os.environ.get('GOOGLE_PLACES_API_KEY')
     YELP_API_KEY = os.environ.get('YELP_API_KEY')
+    EVENTBRITE_API_KEY = os.environ.get('EVENTBRITE_API_KEY')
     
     # Application settings
     APP_NAME = os.environ.get('APP_NAME', 'Accessible Outings Finder')
