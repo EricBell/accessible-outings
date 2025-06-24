@@ -37,7 +37,7 @@
                             </div>
                             
                             <!-- Venue Link -->
-                            <p class="card-text">
+                            <p class="card-text mb-2">
                                 <i class="fas fa-map-marker-alt me-2"></i>
                                 <a href="{{ url_for('main.venue_detail', venue_id=event.venue.id) }}" 
                                    class="text-decoration-none">
@@ -45,8 +45,31 @@
                                 </a>
                             </p>
                             
-                            {% if event.venue.address %}
-                            <p class="text-muted">{{ event.venue.address }}</p>
+                            <!-- Full Address -->
+                            {% if event.venue.address or event.venue.city or event.venue.state or event.venue.zip_code %}
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-location-dot me-2"></i>
+                                {% if event.venue.address %}{{ event.venue.address }}{% endif %}
+                                {% if event.venue.city %}
+                                    {% if event.venue.address %}, {% endif %}{{ event.venue.city }}
+                                {% endif %}
+                                {% if event.venue.state %}
+                                    {% if event.venue.city or event.venue.address %}, {% endif %}{{ event.venue.state }}
+                                {% endif %}
+                                {% if event.venue.zip_code %}
+                                    {% if event.venue.state or event.venue.city or event.venue.address %} {% endif %}{{ event.venue.zip_code }}
+                                {% endif %}
+                            </p>
+                            {% endif %}
+                            
+                            <!-- Phone Number -->
+                            {% if event.venue.phone %}
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-phone me-2"></i>
+                                <a href="tel:{{ event.venue.phone }}" class="text-decoration-none text-muted">
+                                    {{ event.venue.phone }}
+                                </a>
+                            </p>
                             {% endif %}
                         </div>
                         
