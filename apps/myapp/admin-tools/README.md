@@ -22,6 +22,8 @@ This folder contains scripts needed for administrative tasks and data management
 - `update_venue_experiences.py` - Update venue experience tags
 - `reset_categories.py` - Reset venue categories to default
 - `db_migration.py` - Database migration and schema updates
+- `update_events_schema.py` - Add API integration fields to events table
+- `reset_database_fresh.py` - **Clean database reset - removes all fake/generated data**
 
 ## Usage
 
@@ -53,3 +55,9 @@ python create_boston_events.py
 python fix_categories.py
 python fix_venue_addresses.py
 ```
+
+### Fresh Database Reset (Remove Fake Data)
+```bash
+python reset_database_fresh.py
+```
+**Removes all fake/auto-generated events and venues, keeping only real data with Google Place IDs. Use this to start fresh with real Eventbrite events only.**

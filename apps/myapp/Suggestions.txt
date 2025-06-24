@@ -1291,6 +1291,145 @@ Perfect! I've successfully implemented the admin system. Here's what I've create
 
   All database references are now properly relative to the moved script locations!
 
+● ✅ Eventbrite API Integration Complete!
+
+  I've successfully implemented the complete Eventbrite API integration. Here's what's
+  been built:
+
+  Core Architecture
+
+  - BaseEventProvider - Abstract base class for all event APIs
+  - EventbriteProvider - Full Eventbrite API integration
+  - EventAggregator - Combines multiple event sources and manages database sync
+
+  Key Features
+
+  - Real Event Data - Pulls actual events from Eventbrite API
+  - Smart Venue Matching - Links events to existing venues or creates new ones
+  - Event Type Classification - Automatically categorizes events as
+  Fun/Interesting/Off-beat
+  - Accessibility Integration - Combines Eventbrite accessibility info with venue data
+  - Deduplication - Prevents duplicate events from multiple sources
+
+  Database Updates
+
+  - Added API tracking fields: source_api, external_event_id, last_verified,
+  verification_status, api_data
+  - Created database migration script: admin-tools/update_events_schema.py
+
+  Configuration Ready
+
+  - Added EVENTBRITE_API_KEY to config and .env
+  - API key validation and error handling
+
+  Setup Instructions
+
+  1. Get Eventbrite API Key:
+    - Go to https://www.eventbrite.com/platform/api-keys
+    - Create developer account and get your API token
+  2. Update .env file:
+  EVENTBRITE_API_KEY=your_actual_api_key_here
+  3. Run database migration:
+  cd admin-tools && python update_events_schema.py
+  4. Test the integration:
+    - Search for events in your app
+    - Events will now come from Eventbrite API instead of fictional generation
+
+  How It Works
+
+  1. User searches for events by ZIP code
+  2. System finds nearby venues via Google Places API
+  3. EventAggregator searches Eventbrite for real events in that area
+  4. Events are synced to database with venue linkage
+  5. User sees real, current events they can actually attend
+
+  The system now shows only real events from Eventbrite - no more fictional events!
+
+● Perfect! The database schema has been updated successfully. Now restart your Flask app
+  and the Eventbrite integration should work.
+
+  Next Steps:
+  1. Restart your Flask application (stop and start python app.py)
+  2. Add your Eventbrite API key to the .env file:
+  EVENTBRITE_API_KEY=your_actual_eventbrite_token
+  3. Test the search - events will now come from Eventbrite API
+
+  The migration added 5 new columns and created performance indexes. Your existing 19
+  events are preserved as legacy events.
+
+● Perfect! I've updated the event search results template to show:
+
+  1. Full Address: Now displays the complete address with street address, city, state, and
+   ZIP code formatted properly with commas
+  2. Phone Number: Shows the venue's phone number as a clickable link (tel: protocol) so
+  users can tap to call on mobile
+
+  What's New:
+  - Full Address Display: Shows complete address instead of just street address
+  - Phone Link: Clickable phone numbers for easy calling
+  - Better Icons: Uses fa-location-dot for address and fa-phone for phone
+  - Smart Formatting: Only shows address components that exist, with proper comma
+  separation
+
+  Now when users view event search results, they'll see complete venue contact information
+   in each event card, making it easier to contact venues directly or navigate to them.
+
+
+● Perfect! I've created a comprehensive database reset script. Here's what it does:
+
+  🧹 Fresh Database Reset Script
+
+  What it removes:
+  - All fake/auto-generated events (source: 'auto_generated', 'generated', 'sample')
+  - All venues without Google Place IDs (fake venues)
+  - Associated favorites and reviews for deleted events/venues
+  - Empty search history records
+  - Old API cache entries
+
+  What it preserves:
+  - User accounts (including admin)
+  - Venue categories
+  - Real venues with Google Place IDs
+  - Any real events from external APIs
+
+  To run the reset:
+
+  cd admin-tools
+  python reset_database_fresh.py
+
+  The script will:
+  1. Show you current database state
+  2. Ask for confirmation
+  3. Clean out all fake data
+  4. Show you what remains
+  5. Reset ID sequences for clean numbering
+
+  After running this, when you search ZIP 02114, you'll get only real events from the
+  Eventbrite API instead of the fake generated ones. The system will automatically create
+  new venue records as needed when it finds real events.
+
+  Want me to run it for you now?
+
+
+● Perfect! I've fixed the script. The issue was that the venues table doesn't have a
+  source column like the events table does. The corrected script now:
+
+  1. For events: Deletes based on source field (auto_generated, generated, sample)
+  2. For venues: Deletes based on missing google_place_id (which indicates fake venues)
+
+  The logic is:
+  - Real venues = have Google Place IDs from Google Places API
+  - Fake venues = missing or empty Google Place IDs
+
+  Now try running the script again:
+
+  cd admin-tools
+  python reset_database_fresh.py
+
+  This should successfully clean out the fake data while preserving real venues that have
+  proper Google Place IDs.
+
+
 
 
 250619 add new categories
