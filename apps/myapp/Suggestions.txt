@@ -1554,6 +1554,423 @@ Perfect! I've successfully implemented the admin system. Here's what I've create
   I've created a comprehensive DEPLOYMENT.md file with all the details, troubleshooting
   steps, and security considerations for your VPS deployment.
 
+● Perfect! I've created a comprehensive user management tool with all the features you
+  requested:
+
+  👤 User Manager Tool - admin-tools/user_manager.py
+
+  Features:
+
+  1. ✅ Verify Credentials - Enter username/password to verify if they're valid
+  2. 🔐 Change Password - Update any user's password securely
+  3. 🗑️ Delete User - Remove user accounts (with safety checks for admin users)
+  4. 👥 List Users - View all users in the system
+
+  How to Use:
+
+  cd admin-tools
+  python user_manager.py
+
+  Interactive Menu:
+
+  👤 User Manager - Admin Tool
+  ========================================
+
+  Options:
+  1. Verify user credentials
+  2. Change user password
+  3. Delete user account
+  4. List all users
+  5. Exit
+
+  Key Features:
+
+  🔍 Credential Verification:
+  - Tests username/password combinations
+  - Shows detailed user info if found
+  - Works with both username and email
+
+  🔐 Password Changes:
+  - Secure password input (hidden typing)
+  - Password confirmation
+  - Minimum 6 character requirement
+  - Uses proper Werkzeug password hashing
+
+  🗑️ Safe User Deletion:
+  - Shows user info before deletion
+  - Extra confirmation for admin users
+  - Cleans up all related data (favorites, reviews, search history)
+  - Cannot be accidentally executed
+
+  👥 User Listing:
+  - Shows all users in a formatted table
+  - Displays ID, username, email, admin status, creation date
+  - Sorted by admin status then username
+
+  🛡️ Security Features:
+  - Password input is hidden (using getpass)
+  - Admin user deletion requires typing "DELETE" to confirm
+  - All database operations are properly handled with error checking
+  - Uses the same password hashing as your Flask app
+
+  Usage Examples:
+
+  1. Verify admin credentials: Enter "admin" and "password" to test
+  2. Change admin password: Update to a secure password for production
+  3. List users: See all registered users
+  4. Delete test accounts: Clean up unwanted user accounts
+
+  The tool is now ready to use and documented in the admin-tools README!
+
+
+● Perfect! I've fixed the user_manager.py script by removing all references to the
+  last_login column that doesn't exist in the database schema.
+
+  🔧 Fixed Issues:
+  - Removed last_login from all SQL queries
+  - Updated the user info display to show "Not tracked" for last login
+  - Fixed the list users functionality to work with the actual database schema
+
+  ✅ Now the tool should work correctly:
+
+  cd admin-tools
+  python user_manager.py
+
+  Try option 4 again - it should now list all users without the database error. The tool
+  will show:
+  - User ID
+  - Username
+  - Email
+  - Admin status (Yes/No)
+  - Created date
+
+  The last_login field isn't tracked in your current database schema, so I've removed it
+  from the tool to match your actual table structure.
+
+● The location of your logs depends on how you deployed the Flask application. Here are
+  the common places to check:
+
+  🔍 Log Locations by Deployment Method:
+
+  1. If running with python app.py directly:
+
+  # Application logs (if configured)
+  tail -f app.log
+  tail -f /path/to/your/app/app.log
+
+  # System logs
+  journalctl -f -u your-service-name
+
+  2. If using systemd service:
+
+  # Check service logs
+  journalctl -f -u your-app-name
+  journalctl -u your-app-name --since "1 hour ago"
+
+  # Or if you named your service differently
+  sudo systemctl status your-service-name
+
+  3. If using Gunicorn:
+
+  # Gunicorn access logs
+  tail -f /var/log/gunicorn/access.log
+  tail -f /var/log/gunicorn/error.log
+
+  # Or wherever you configured gunicorn logs
+  tail -f /path/to/gunicorn/logs/
+
+  4. If using Nginx (reverse proxy):
+
+  # Nginx logs
+  tail -f /var/log/nginx/access.log
+  tail -f /var/log/nginx/error.log
+
+  # Your site-specific logs
+  tail -f /var/log/nginx/your-domain-access.log
+  tail -f /var/log/nginx/your-domain-error.log
+
+  5. Application-specific logs (from your .env):
+
+  Based on your config, check:
+  # Your app writes to app.log by default
+  tail -f /path/to/your/app/app.log
+
+  # Or in the app directory
+  cd /path/to/accessible-outings/apps/myapp
+  tail -f app.log
+
+  🔧 Quick Log Discovery Commands:
+
+  # Find log files related to your app
+  find /var/log -name "*accessible*" -o -name "*outings*" 2>/dev/null
+  find /home -name "*.log" 2>/dev/null | grep -E "(app|accessible|outings)"
+
+  # Check systemd services
+  systemctl list-units --type=service | grep -E "(accessible|outings|flask)"
+
+  # Check running processes
+  ps aux | grep -E "(python|gunicorn|flask)" | grep -v grep
+
+  📋 To Enable Better Logging:
+
+  If you don't see logs, add this to your deployment:
+
+  1. Check your .env file for LOG_FILE setting
+  2. Add logging to your startup script:
+
+  # For direct Python
+  nohup python app.py > app.log 2>&1 &
+
+  # For Gunicorn
+  gunicorn --bind 0.0.0.0:8000 --access-logfile access.log --error-logfile error.log
+  app:app
+
+  Tell me how you deployed the app and I can give you the exact commands to check your 
+  logs!
+
+
+● The error indicates your Eventbrite API is returning a 404 error. I've created a
+  diagnostic tool to help troubleshoot this issue.
+
+  🔍 Eventbrite API Troubleshooting
+
+  Run this diagnostic tool on your VPS:
+
+  cd admin-tools
+  python test_eventbrite_api.py
+
+  The 404 error could be caused by:
+
+  1. Invalid API Key - The key might be expired or incorrect
+  2. API Endpoint Changed - Eventbrite may have updated their API
+  3. Permissions Issue - Your API key may not have event search permissions
+  4. Rate Limiting - You may have exceeded API limits
+
+  🔧 Quick Fixes to Try:
+
+  1. Verify API Key:
+    - Check your .env file on the VPS
+    - Ensure EVENTBRITE_API_KEY is set correctly
+    - Visit https://www.eventbrite.com/platform/api-keys to verify it's active
+  2. Test with curl on your VPS:
+  curl -H "Authorization: Bearer YOUR_API_KEY" \
+       "https://www.eventbriteapi.com/v3/users/me/"
+  3. Check for API changes:
+    - Eventbrite may have changed their API endpoints
+    - The diagnostic tool will test multiple endpoints
+
+  Run the diagnostic tool and let me know what it outputs - that will tell us exactly 
+  what's wrong with the Eventbrite integration!
+
+● Perfect! I've disabled the Eventbrite integration by:
+
+  🔧 Changes Made:
+
+  1. Commented out Eventbrite initialization in the event aggregator
+  2. Added clear documentation explaining why it's disabled
+  3. Added graceful handling for when no external providers are available
+  4. Preserved the code structure for future re-enabling if needed
+
+  📋 Current Behavior:
+
+  - No more 404 errors from Eventbrite API
+  - Uses only local events stored in your database
+  - Logs will show: "External event providers disabled - using local events only"
+  - Preserves existing events that are already in the database
+
+  🔮 Future Options:
+
+  When you're ready to add real events again, you could:
+
+  1. Web scraping from Eventbrite's public pages
+  2. Facebook Events API (if available)
+  3. Local venue websites scraping
+  4. Manual event entry through admin interface
+  5. Google Events integration
+  6. Meetup API for community events
+
+  The Eventbrite provider code is still there (just commented out), so it can be easily
+  re-enabled if they change their API policies or you get approved for higher-level
+  access.
+
+  Your app will now work without the 404 errors and will show only real events that exist 
+  in your database.
+
+● Based on my analysis, here are the current event data sources your app is using:
+
+  📊 Current Event Data Sources:
+
+  1. Local Database Events Only
+
+  - Source: Local SQLite/PostgreSQL database
+  - Type: Manually created sample/test events
+  - Content: Created by admin scripts (create_sample_events.py, create_boston_events.py)
+  - Status: ✅ Active (limited data)
+
+  2. Eventbrite API
+
+  - Source: Eventbrite v3 API
+  - Type: Real external events
+  - Status: ❌ Disabled (doesn't allow public searches)
+
+  3. Auto-Generated Events
+
+  - Source: utils/event_generator.py
+  - Type: Fictional events based on venue types
+  - Status: ❌ Removed (per your request for real events only)
+
+  📉 Current Reality:
+
+  Your app currently has VERY LIMITED event data:
+  - Only manual sample events in the database
+  - No real external event feeds
+  - No live event discovery
+
+  🔍 What Events Exist Now:
+
+  The events in your database likely come from:
+  1. Sample events - Created by admin scripts for testing
+  2. Historical events - Any events manually added previously
+  3. No real-time events - No live event feeds are working
+
+  🚀 Recommended Event Data Sources:
+
+  Immediate Options:
+  1. Manual Entry - Admin interface to add real events
+  2. CSV Import - Bulk import from event listings
+  3. Local Venue Websites - Scrape individual venue sites
+
+  Medium-term Options:
+  4. Facebook Events - Public event scraping
+  5. Meetup API - Community events
+  6. Google Events - Structured data from search
+  7. Library/Museum APIs - Many have public event APIs
+
+  Would you like me to implement any of these alternative event sources?
+
+
+● 💯 Absolutely agreed! You've identified the exact correct approach. Let me outline this
+  location-first, category-driven strategy:
+
+  🎯 The Correct Flow
+
+  User Input → Geographic Discovery → Category-Based Event Search
+
+  ZIP Code + Radius
+      ↓
+  Find Venues by Category (Google Places API)
+      ↓
+  For Each Venue Category:
+      ↓
+  Query/Scrape Events from Venue-Specific Sources
+      ↓
+  Aggregate & Present Events
+
+  🏗️ Implementation Strategy
+
+  1. Geographic Venue Discovery (Already Working)
+
+  # You already have this working
+  venues = google_places_api.search_nearby(
+      lat, lon, radius,
+      category='museums'  # theaters, libraries, etc.
+  )
+
+  2. Category-Specific Event Sources
+
+  Museums Category:
+  - Individual museum websites
+  - Museum Facebook pages
+  - Museum APIs (many have them)
+
+  Theaters Category:
+  - Theater websites (ticketing systems)
+  - Theater Facebook pages
+  - Regional theater directories
+
+  Libraries Category:
+  - Library event calendars
+  - Library system APIs
+  - Eventkeeper/LibCal integrations
+
+  Bird Watching Category:
+  - Audubon society websites
+  - Nature center calendars
+  - State park event systems
+
+  3. Venue-Specific Scraping Strategy
+
+  # For each discovered venue
+  for venue in venues_by_category['museums']:
+      events = []
+
+      # Try venue website
+      if venue.website:
+          events.extend(scrape_venue_website(venue.website))
+
+      # Try venue Facebook page
+      if venue.facebook_page:
+          events.extend(scrape_facebook_page(venue.facebook_page))
+
+      # Try venue-specific APIs
+      events.extend(check_venue_apis(venue))
+
+  📋 Category-Specific Implementation Plan
+
+  Phase 1: High-Value Categories
+
+  1. Museums - Often have good websites/APIs
+  2. Libraries - Excellent structured event data
+  3. Theaters - Ticketing systems with event feeds
+
+  Phase 2: Specialized Categories
+
+  4. Nature/Bird Watching - Audubon, parks
+  5. Art Galleries - Often have event calendars
+  6. Community Centers - Municipal websites
+
+  Phase 3: Retail/Commercial
+
+  7. Craft Stores - Workshop calendars
+  8. Garden Centers - Seasonal events
+
+  🔧 Technical Architecture
+
+  class CategoryEventProvider:
+      def search_events_for_category(self, category, venues, date_range):
+          scrapers = {
+              'museums': [MuseumWebsiteScraper(), MuseumFacebookScraper()],
+              'libraries': [LibraryCalendarScraper(), LibCalAPIScraper()],
+              'theaters': [TheaterWebsiteScraper(), TicketingScraper()],
+              # etc.
+          }
+
+          events = []
+          for venue in venues:
+              for scraper in scrapers.get(category, []):
+                  events.extend(scraper.get_events(venue, date_range))
+
+          return events
+
+  💡 Key Advantages
+
+  1. Scalable - Add new categories incrementally
+  2. Reliable - Venue websites are more stable than general scraping
+  3. Quality - Venue-specific events are higher quality
+  4. Accessible - Can prioritize accessibility-friendly venues
+  5. Legal - Scraping individual venue sites is more defensible
+
+  🚀 Next Steps
+
+  1. Pick one category to start with (I recommend Libraries - best data)
+  2. Build venue-specific scrapers for that category
+  3. Test with 5-10 venues in a single geographic area
+  4. Scale to other categories once proven
+
+  This approach makes perfect sense and leverages your existing venue discovery system. 
+  Should we start with implementing library event scraping since they typically have the 
+  most structured, accessible event data?
+
 
 250619 add new categories
 1. create a way to try and discover new categories. 

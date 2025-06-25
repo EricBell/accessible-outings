@@ -22,20 +22,24 @@ class EventAggregator:
     
     def _initialize_providers(self):
         """Initialize available event providers based on configuration"""
-        # Initialize Eventbrite if API key is available
-        eventbrite_key = current_app.config.get('EVENTBRITE_API_KEY')
-        if eventbrite_key:
-            try:
-                provider = EventbriteProvider(eventbrite_key)
-                if provider.validate_api_key():
-                    self.providers.append(provider)
-                    self.logger.info("Eventbrite provider initialized successfully")
-                else:
-                    self.logger.warning("Invalid Eventbrite API key")
-            except Exception as e:
-                self.logger.error(f"Failed to initialize Eventbrite provider: {e}")
-        else:
-            self.logger.info("No Eventbrite API key configured")
+        # Eventbrite integration disabled - v3 API doesn't allow public searches
+        # TODO: Consider web scraping or alternative event sources in the future
+        # 
+        # eventbrite_key = current_app.config.get('EVENTBRITE_API_KEY')
+        # if eventbrite_key:
+        #     try:
+        #         provider = EventbriteProvider(eventbrite_key)
+        #         if provider.validate_api_key():
+        #             self.providers.append(provider)
+        #             self.logger.info("Eventbrite provider initialized successfully")
+        #         else:
+        #             self.logger.warning("Invalid Eventbrite API key")
+        #     except Exception as e:
+        #         self.logger.error(f"Failed to initialize Eventbrite provider: {e}")
+        # else:
+        #     self.logger.info("No Eventbrite API key configured")
+        
+        self.logger.info("External event providers disabled - using local events only")
     
     def search_and_sync_events(
         self,
@@ -72,29 +76,33 @@ class EventAggregator:
         
         self.logger.info(f"Found {len(existing_events)} existing events in database")
         
-        # If we have few events, search external sources
-        if len(existing_events) < max_results // 2:
-            self.logger.info(f"Searching external sources for more events near {location}")
-            
-            for provider in self.providers:
-                try:
-                    # Search this provider
-                    provider_events = provider.search_events(
-                        location=location,
-                        start_date=start_date,
-                        end_date=end_date,
-                        max_results=max_results
-                    )
-                    
-                    self.logger.info(f"Found {len(provider_events)} events from {provider.provider_name}")
-                    
-                    # Sync events to database
-                    synced_events = self._sync_events_to_database(provider_events)
-                    all_events.extend(synced_events)
-                    
-                except Exception as e:
-                    self.logger.error(f"Error searching {provider.provider_name}: {e}")
-                    continue
+        # External event providers are currently disabled
+        if len(self.providers) == 0:
+            self.logger.info("No external event providers configured - using local events only")
+        else:
+            # If we have few events, search external sources
+            if len(existing_events) < max_results // 2:
+                self.logger.info(f"Searching external sources for more events near {location}")
+                
+                for provider in self.providers:
+                    try:
+                        # Search this provider
+                        provider_events = provider.search_events(
+                            location=location,
+                            start_date=start_date,
+                            end_date=end_date,
+                            max_results=max_results
+                        )
+                        
+                        self.logger.info(f"Found {len(provider_events)} events from {provider.provider_name}")
+                        
+                        # Sync events to database
+                        synced_events = self._sync_events_to_database(provider_events)
+                        all_events.extend(synced_events)
+                        
+                    except Exception as e:
+                        self.logger.error(f"Error searching {provider.provider_name}: {e}")
+                        continue
         
         # Combine existing and new events
         all_event_ids = set(e.id for e in existing_events)

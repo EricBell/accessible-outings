@@ -3,6 +3,7 @@
 This folder contains scripts needed for administrative tasks and data management.
 
 ## User Management
+- `user_manager.py` - **Interactive user management tool (verify/change/delete users)**
 - `create_admin_user.py` - Create a new admin user account
 - `fix_admin_password.py` - Fix admin user password issues
 - `fix_admin_password_final.py` - Final admin password reset tool
@@ -55,6 +56,12 @@ python create_boston_events.py
 python fix_categories.py
 python fix_venue_addresses.py
 ```
+
+### User Management
+```bash
+python user_manager.py
+```
+**Interactive tool to verify credentials, change passwords, and delete user accounts.**
 
 ### Fresh Database Reset (Remove Fake Data)
 ```bash
