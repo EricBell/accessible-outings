@@ -69,6 +69,12 @@ psql -h your-nas-ip -U accessible_user -d accessible_outings -f database/schema.
 
 ### 4. Environment Configuration
 
+`.env` is per-machine and git-ignored — it's never committed and never synced by the deploy script
+(`justfile`'s rsync explicitly excludes it). If you run Postgres in more than one place (e.g. a NAS
+on your local network for dev, and a separate instance on the VPS for production), each machine
+needs its own `.env` with its own `DATABASE_URL` pointing at the Postgres server reachable from
+that machine. There's no shared config to keep in sync between them by design.
+
 Copy the example environment file and configure it:
 
 ```bash
