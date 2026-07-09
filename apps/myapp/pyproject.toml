@@ -1,0 +1,28 @@
+[project]
+name = "accessible-outings"
+version = "0.3.10"
+description = "A Flask web application for finding wheelchair-accessible indoor activities and venues."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "Flask==2.3.3",
+    "Flask-SQLAlchemy==3.0.5",
+    "Flask-Login==0.6.3",
+    "Flask-WTF==1.1.1",
+    "WTForms==3.0.1",
+    "psycopg2-binary==2.9.9",
+    "SQLAlchemy==2.0.21",
+    "bcrypt==4.0.1",
+    "Werkzeug==2.3.7",
+    "requests==2.31.0",
+    "urllib3==2.0.4",
+    "python-dotenv==1.0.0",
+    "python-dateutil==2.8.2",
+    "jsonschema==4.19.1",
+]
+
+[dependency-groups]
+dev = [
+    "Flask-DebugToolbar==0.13.1",
+    "pytest==7.4.2",
+    "pytest-flask==1.2.0",
+]

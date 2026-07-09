@@ -32,7 +32,7 @@ This application was specifically designed for:
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- [uv](https://docs.astral.sh/uv/) (manages the Python version and virtual environment)
 - PostgreSQL database server
 - Google Cloud Platform account (for Places API)
 
@@ -43,20 +43,15 @@ git clone <repository-url>
 cd accessible-outings
 ```
 
-### 2. Create Virtual Environment
+### 2. Install Dependencies
+
+`uv` creates and manages the virtual environment for you:
 
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+uv sync
 ```
 
-### 3. Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Database Setup
+### 3. Database Setup
 
 #### Create PostgreSQL Database
 
@@ -72,7 +67,7 @@ GRANT ALL PRIVILEGES ON DATABASE accessible_outings TO accessible_user;
 psql -h your-nas-ip -U accessible_user -d accessible_outings -f database/schema.sql
 ```
 
-### 5. Environment Configuration
+### 4. Environment Configuration
 
 Copy the example environment file and configure it:
 
@@ -99,7 +94,7 @@ BYPASS_AUTH=True
 DEFAULT_USER_ID=1
 ```
 
-### 6. Get Google Places API Key
+### 5. Get Google Places API Key
 
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select existing one
@@ -109,10 +104,10 @@ DEFAULT_USER_ID=1
 4. Create credentials (API Key)
 5. Add the API key to your `.env` file
 
-### 7. Run the Application
+### 6. Run the Application
 
 ```bash
-python app.py
+uv run python app.py
 ```
 
 The application will be available at `http://localhost:5000`

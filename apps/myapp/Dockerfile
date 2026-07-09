@@ -4,10 +4,11 @@
 # Moved down to python 3.12.
 FROM python:3.12-alpine3.21@sha256:690af2fd7f62e24289b28a397baa54eb6978340b4a3106df1015807706f1c7f2
 # latest? eb120d016adcbc8bac194e15826bbb4f1d1569d298d8817bb5049ed5e59f41d9
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 WORKDIR /app
-COPY requirements.txt .
 RUN apk add --no-cache gcc musl-dev postgresql-dev
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-cache
 COPY . .
-CMD ["python", "app.py"]
+CMD ["uv", "run", "python", "app.py"]

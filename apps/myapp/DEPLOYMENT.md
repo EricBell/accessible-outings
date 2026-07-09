@@ -4,7 +4,7 @@ This guide covers the essential scripts and steps needed to deploy the Accessibl
 
 ## Prerequisites
 
-1. **Python 3.8+** installed on VPS
+1. **[uv](https://docs.astral.sh/uv/)** installed on VPS (manages the Python version and virtual environment)
 2. **PostgreSQL** database setup (recommended for production)
 3. **Environment variables** configured
 4. **API Keys** obtained and configured
@@ -50,32 +50,32 @@ Run these scripts from the `admin-tools/` directory:
 cd admin-tools
 
 # 1. Initial database setup and schema creation
-python db_migration.py
+uv run python db_migration.py
 
 # 2. Add API integration fields to events table
-python update_events_schema.py
+uv run python update_events_schema.py
 
 # 3. Create admin user account
-python create_admin_user.py
+uv run python create_admin_user.py
 
 # 4. Verify admin setup is working
-python verify_admin_setup.py
+uv run python verify_admin_setup.py
 ```
 
 ### 3. Category Setup
 
 ```bash
 # If you need to set up venue categories from scratch
-python reset_categories.py
-python fix_categories.py
+uv run python reset_categories.py
+uv run python fix_categories.py
 ```
 
 ### 4. Optional: Sample Data (for testing)
 
 ```bash
 # Only run if you want sample data for testing
-# python create_sample_events.py
-# python create_boston_events.py
+# uv run python create_sample_events.py
+# uv run python create_boston_events.py
 ```
 
 ### 5. Production Database Validation
@@ -83,7 +83,7 @@ python fix_categories.py
 ```bash
 # Check database schema and integrity
 cd ../debug-tools
-python check_schema.py
+uv run python check_schema.py
 ```
 
 ## Essential Scripts Summary
@@ -119,10 +119,10 @@ chmod +x debug-tools/*.py
 ### Application Startup
 ```bash
 # Production startup (use gunicorn or similar)
-gunicorn --bind 0.0.0.0:8000 app:app
+uv run gunicorn --bind 0.0.0.0:8000 app:app
 
 # Or for development testing
-python app.py
+uv run python app.py
 ```
 
 ## Verification Checklist
@@ -152,20 +152,20 @@ curl "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=42.3
 ### Database Issues
 ```bash
 # Check database connection
-python -c "from app import app; app.app_context().push(); from models import db; print('DB Connected:', db.engine.url)"
+uv run python -c "from app import app; app.app_context().push(); from models import db; print('DB Connected:', db.engine.url)"
 ```
 
 ### Missing Admin User
 ```bash
 cd admin-tools
-python clean_admin_setup.py
-python create_admin_user.py
+uv run python clean_admin_setup.py
+uv run python create_admin_user.py
 ```
 
 ### Schema Problems
 ```bash
 cd admin-tools
-python db_migration.py --force-recreate
+uv run python db_migration.py --force-recreate
 ```
 
 ## Production Security
@@ -189,12 +189,12 @@ python db_migration.py --force-recreate
 **Quick Start Command Sequence:**
 ```bash
 cd admin-tools
-python db_migration.py
-python update_events_schema.py  
-python create_admin_user.py
-python verify_admin_setup.py
+uv run python db_migration.py
+uv run python update_events_schema.py  
+uv run python create_admin_user.py
+uv run python verify_admin_setup.py
 cd ..
-python app.py
+uv run python app.py
 ```
 
 Your app should now be ready for production use!

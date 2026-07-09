@@ -16,10 +16,10 @@ pkill -f "python.*app.py"
 rm -f instance/accessible_outings.db
 
 # 3. Install dependencies
-pip install -r requirements.txt
+uv sync
 
 # 4. Start fresh
-python app.py
+uv run python app.py
 ```
 
 ## What Happens on First Start
@@ -42,10 +42,10 @@ python app.py
 ## Running Tests
 ```bash
 # Run all tests
-python -m unittest unit_tests
+uv run python -m unittest unit_tests
 
 # Run specific test
-python -m unittest unit_tests.VenueDetailTestCase.test_venue_detail_template_missing_error -v
+uv run python -m unittest unit_tests.VenueDetailTestCase.test_venue_detail_template_missing_error -v
 ```
 
 ## Files to Know About
@@ -55,7 +55,7 @@ python -m unittest unit_tests.VenueDetailTestCase.test_venue_detail_template_mis
 
 # Setup and Configuration a new environment
 1. Clone this project
-2. Root level, create venv named .venv.
-3. source the venv and install requirements.
+2. Install [uv](https://docs.astral.sh/uv/) if you don't already have it.
+3. From `apps/myapp/`, run `uv sync` to create the venv and install dependencies.
 4. copy apps/myapp/.env to its placae in this config
 

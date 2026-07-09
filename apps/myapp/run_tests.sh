@@ -1,3 +1,3 @@
 #!/bin/sh
 
-python3 unit_tests.py ${@}
+uv run python3 unit_tests.py ${@}

@@ -19,7 +19,7 @@ echo "   Cache cleaned"
 
 # Ensure requirements are installed
 echo "📦 Checking dependencies..."
-pip install -q -r requirements.txt
+uv sync -q
 echo "   Dependencies ready"
 
 # Create instance directory if needed
@@ -33,4 +33,4 @@ echo "   Press Ctrl+C to stop"
 echo ""
 
 # Start the app
-python app.py
+uv run python app.py
