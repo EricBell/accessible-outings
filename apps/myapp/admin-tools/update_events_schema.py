@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
 Update Events Schema - Add new API integration fields to events table
+
+DEPRECATED: schema changes are now managed by Alembic (see apps/myapp/migrations/).
+Run `uv run flask db upgrade` instead. This script is kept for historical reference
+only and operates on a stale hardcoded SQLite path - it will not update Postgres.
 """
 import sys
 import os

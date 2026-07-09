@@ -2,18 +2,28 @@ import os
 import logging
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
+from flask_migrate import Migrate, upgrade as db_upgrade
 from config import get_config
 from models import db, login_manager
 from utils.google_places import GooglePlacesAPI, VenueSearchService
 from utils.geocoding import GeocodingService, LocationService
 from utils.accessibility import AccessibilityFilter
 
+migrate = Migrate()
+
 def _initialize_database(app):
     """Initialize database with sample data if needed."""
+    from sqlalchemy import inspect as sa_inspect
     from models.venue import VenueCategory
     from models.user import User
     from utils.database import is_sqlite
-    
+
+    # Guard against running before migrations have created the schema
+    # (e.g. the very first 'flask db migrate' autogenerate run).
+    if 'venue_categories' not in sa_inspect(db.engine).get_table_names():
+        app.logger.warning("venue_categories table not found - skipping sample data initialization.")
+        return
+
     # Check if we need to initialize data
     if VenueCategory.query.count() == 0:
         app.logger.info("Initializing database with sample data...")
@@ -82,6 +92,7 @@ def create_app(config_class=None):
     
     # Initialize extensions
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
     
     # Configure logging
@@ -108,12 +119,22 @@ def create_app(config_class=None):
     app.venue_search_service = VenueSearchService(google_api)
     app.location_service = LocationService(geocoding_service)
     
-    # Create database tables
+    # Apply pending Alembic migrations (replaces db.create_all() - the
+    # migrations directory is the source of truth for schema now). Guarded
+    # so 'flask db init'/'flask db migrate' can still import this app before
+    # the migrations directory exists.
+    migrations_dir = os.path.join(app.root_path, migrate.directory)
     with app.app_context():
-        db.create_all()
-        
-        # Initialize database with sample data if needed
-        _initialize_database(app)
+        if os.path.isdir(migrations_dir):
+            db_upgrade()
+
+            # Initialize database with sample data if needed
+            _initialize_database(app)
+        else:
+            app.logger.warning(
+                "No migrations directory found - skipping db_upgrade() and "
+                "sample data initialization. Run 'flask db init' to create one."
+            )
         
         # Validate configuration
         config_errors = config_class.validate_config()

@@ -2,6 +2,10 @@
 """
 Database Migration and Schema Update Module
 
+DEPRECATED: schema changes are now managed by Alembic (see apps/myapp/migrations/).
+Run `uv run flask db upgrade` instead. This script is kept for historical reference
+only and operates on a stale hardcoded SQLite path - it will not update Postgres.
+
 This module ensures the database schema is up-to-date with the latest model definitions.
 Run this when switching between development environments to synchronize schema changes.
 

@@ -4,3 +4,5 @@
 !uv.lock
 !run_tests.sh
 !templates/
+!migrations/
+!migrations/**

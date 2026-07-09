@@ -42,23 +42,38 @@ SESSION_COOKIE_HTTPONLY=True
 BYPASS_AUTH=False
 ```
 
-### 2. Database Migration Scripts (Run in Order)
+### 2. Database Schema (Alembic)
 
-Run these scripts from the `admin-tools/` directory:
+Schema creation and changes are managed by Alembic (`apps/myapp/migrations/`), not by the
+old `admin-tools/db_migration.py` / `update_events_schema.py` scripts (those are deprecated
+and kept only for historical reference - they operate on a stale hardcoded SQLite path and
+won't touch Postgres).
+
+**Brand-new database** (nothing created yet): the app applies pending migrations
+automatically on startup, so you can skip straight to running the app. To apply them
+manually first instead:
+
+```bash
+uv run flask db upgrade
+```
+
+**Existing database** (already has tables from a previous `schema.sql`/admin-tools setup):
+tell Alembic it's already at the baseline instead of trying to recreate the tables:
+
+```bash
+uv run flask db stamp 7298bca17ff7
+```
+
+From then on, `uv run flask db upgrade` (or just starting the app) applies any future
+migrations on top of that baseline.
+
+Then create the admin account:
 
 ```bash
 cd admin-tools
-
-# 1. Initial database setup and schema creation
-uv run python db_migration.py
-
-# 2. Add API integration fields to events table
-uv run python update_events_schema.py
-
-# 3. Create admin user account
 uv run python create_admin_user.py
 
-# 4. Verify admin setup is working
+# Verify admin setup is working
 uv run python verify_admin_setup.py
 ```
 
@@ -89,10 +104,9 @@ uv run python check_schema.py
 ## Essential Scripts Summary
 
 ### Must Run (in order):
-1. `admin-tools/db_migration.py` - Creates all database tables and schema
-2. `admin-tools/update_events_schema.py` - Adds Eventbrite API fields
-3. `admin-tools/create_admin_user.py` - Creates admin account
-4. `admin-tools/verify_admin_setup.py` - Verifies admin login works
+1. `uv run flask db upgrade` (or `flask db stamp 7298bca17ff7` for an existing database) - Creates/aligns all database tables and schema
+2. `admin-tools/create_admin_user.py` - Creates admin account
+3. `admin-tools/verify_admin_setup.py` - Verifies admin login works
 
 ### Optional:
 - `admin-tools/reset_categories.py` - Reset venue categories to defaults
@@ -164,8 +178,14 @@ uv run python create_admin_user.py
 
 ### Schema Problems
 ```bash
-cd admin-tools
-uv run python db_migration.py --force-recreate
+# Check the current migration state
+uv run flask db current
+
+# See what would change
+uv run flask db upgrade --sql
+
+# Apply pending migrations
+uv run flask db upgrade
 ```
 
 ## Production Security
@@ -188,9 +208,8 @@ uv run python db_migration.py --force-recreate
 
 **Quick Start Command Sequence:**
 ```bash
+uv run flask db upgrade  # or: flask db stamp 7298bca17ff7 for an existing database
 cd admin-tools
-uv run python db_migration.py
-uv run python update_events_schema.py  
 uv run python create_admin_user.py
 uv run python verify_admin_setup.py
 cd ..

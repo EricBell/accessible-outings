@@ -61,11 +61,20 @@ CREATE USER accessible_user WITH PASSWORD 'your_password';
 GRANT ALL PRIVILEGES ON DATABASE accessible_outings TO accessible_user;
 ```
 
-#### Run Database Schema
+#### Create the Schema
+
+Tables are created and kept up to date by Alembic migrations, not by running SQL by hand.
+The app applies any pending migrations automatically on startup, so after creating the
+database above, just continue to step 4 and run the app - `apps/myapp/migrations/` is
+the source of truth for the schema. To apply migrations manually instead (e.g. before
+starting the app, or on the VPS), run:
 
 ```bash
-psql -h your-nas-ip -U accessible_user -d accessible_outings -f database/schema.sql
+uv run flask db upgrade
 ```
+
+`database/schema.sql` / `database/schema_sqlite.sql` are kept only as a historical
+reference snapshot and are no longer run by the app.
 
 ### 4. Environment Configuration
 

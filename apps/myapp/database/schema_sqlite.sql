@@ -1,5 +1,10 @@
 -- Wheelchair-Friendly Outing Finder Database Schema
 -- SQLite Database Schema for Accessible Outings Application
+--
+-- SUPERSEDED: schema changes are now managed by Alembic (see apps/myapp/migrations/).
+-- This file is kept as a historical/reference snapshot of the schema at the time
+-- Alembic was adopted (migrations/versions/7298bca17ff7_baseline_schema.py) - it is
+-- not run by the application and will drift from the real schema over time.
 
 -- Drop tables if they exist (for clean setup)
 DROP TABLE IF EXISTS search_history;
