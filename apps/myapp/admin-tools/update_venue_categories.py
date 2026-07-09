@@ -39,10 +39,10 @@ def update_venue_categories():
         
         for venue in venues_without_categories:
             try:
-                # Create mock place data from venue information
+                # Create mock place data from venue information (Places API (New) shape)
                 place_data = {
-                    'place_id': venue.google_place_id,
-                    'name': venue.name,
+                    'id': venue.google_place_id,
+                    'displayName': {'text': venue.name},
                     'types': [],  # We don't have stored types, so rely on name-based categorization
                 }
                 

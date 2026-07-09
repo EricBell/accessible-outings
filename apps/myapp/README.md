@@ -99,7 +99,7 @@ DEFAULT_USER_ID=1
 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select existing one
 3. Enable the following APIs:
-   - Places API
+   - Places API (New)
    - Geocoding API
 4. Create credentials (API Key)
 5. Add the API key to your `.env` file
