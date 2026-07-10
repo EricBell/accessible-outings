@@ -123,6 +123,18 @@ CREATE USER app_user WITH PASSWORD 'secure_password';
 GRANT ALL PRIVILEGES ON DATABASE accessible_outings TO app_user;
 ```
 
+On Postgres 15+, the grant above does not include permission to create tables - you also
+need a schema-level grant, run while connected *to* `accessible_outings` specifically
+(schema privileges are per-database):
+
+```sql
+\c accessible_outings
+GRANT ALL ON SCHEMA public TO app_user;
+```
+
+Without this, `flask db upgrade` (see "Database Schema (Alembic)" above) fails with
+`permission denied for schema public`.
+
 ### File Permissions
 ```bash
 # Make scripts executable

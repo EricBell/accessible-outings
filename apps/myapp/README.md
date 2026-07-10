@@ -55,10 +55,24 @@ uv sync
 
 #### Create PostgreSQL Database
 
+Connect as a superuser (e.g. `postgres`) and create the database, user, and database-level
+grant:
+
 ```sql
 CREATE DATABASE accessible_outings;
 CREATE USER accessible_user WITH PASSWORD 'your_password';
 GRANT ALL PRIVILEGES ON DATABASE accessible_outings TO accessible_user;
+```
+
+**This alone is not enough** - on Postgres 15+, `GRANT ALL PRIVILEGES ON DATABASE` no
+longer implies permission to create tables inside it. Without the extra grant below,
+`flask db upgrade` will fail with `permission denied for schema public`. Reconnect
+(`\c accessible_outings` in `psql`, or a fresh `psql -d accessible_outings` connection -
+schema privileges are per-database, so you must be connected to `accessible_outings`
+itself, not `postgres` or any other default database) and run:
+
+```sql
+GRANT ALL ON SCHEMA public TO accessible_user;
 ```
 
 #### Create the Schema
