@@ -621,3 +621,54 @@ def admin_delete_user(user_id):
     db.session.commit()
     flash(f"Deleted user {username}.", 'info')
     return redirect(url_for('main.admin_users'))
+
+@main_bp.route('/admin/seed', methods=['GET', 'POST'])
+@admin_required
+def admin_seed():
+    """Admin tool to proactively seed venue data for a region."""
+    categories = VenueCategory.query.order_by(VenueCategory.name).all()
+
+    if request.method == 'POST':
+        zip_code = request.form.get('zip_code', '').strip()
+        radius = request.form.get('radius', current_app.config.get('DEFAULT_SEARCH_RADIUS_MILES', 30), type=int)
+        max_radius = current_app.config.get('MAX_SEARCH_RADIUS_MILES', 60)
+        radius = min(radius, max_radius)
+        selected_category_ids = {int(cid) for cid in request.form.getlist('category_ids')}
+
+        if not zip_code:
+            flash('Please provide a ZIP code.', 'error')
+            return render_template('admin_seed.html', categories=categories)
+
+        coordinates = current_app.location_service.get_search_coordinates(zip_code=zip_code)
+        if not coordinates:
+            flash('Invalid ZIP code or unable to find location.', 'error')
+            return render_template('admin_seed.html', categories=categories)
+
+        latitude, longitude = coordinates
+        selected_categories = [c for c in categories if c.id in selected_category_ids] or categories
+
+        results = []
+        total_before = Venue.query.count()
+        for category in selected_categories:
+            count_before = Venue.query.count()
+            try:
+                venues = current_app.venue_search_service.search_venues(
+                    latitude=latitude,
+                    longitude=longitude,
+                    radius_miles=radius,
+                    category_id=category.id
+                )
+                found = len(venues)
+                new_count = Venue.query.count() - count_before
+            except Exception as e:
+                current_app.logger.error(f"Seeding error for category {category.name}: {e}")
+                found = 0
+                new_count = 0
+            results.append({'category': category.name, 'found': found, 'new': new_count})
+
+        total_new = Venue.query.count() - total_before
+        flash(f"Seeding complete for {zip_code}: {total_new} new venues added.", 'success')
+        return render_template('admin_seed.html', categories=categories, results=results,
+                                zip_code=zip_code, radius=radius)
+
+    return render_template('admin_seed.html', categories=categories)

@@ -142,6 +142,10 @@ uv run flask create-admin
 Prompts for a username/email/password and creates a user with admin access. Additional admins
 can be promoted later from the web UI at `/admin/users` once you're logged in as one.
 
+Once logged in as an admin, `/admin/seed` lets you proactively populate venue data for a ZIP
+code/region (e.g. before launching in a new area) instead of waiting for a real user search to
+trigger it.
+
 ### 7. Run the Application
 
 ```bash

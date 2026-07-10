@@ -78,6 +78,10 @@ app's real `User` model and Werkzeug password hashing. Additional admins can be 
 same way, or promoted from the web UI at `/admin/users` (see "User Management" below) once one
 admin account exists.
 
+Once logged in as an admin, `/admin/seed` proactively populates venue data for a ZIP
+code/region (one Google Places search per selected category) - useful for pre-seeding a new
+metro area before real users start searching it there.
+
 ### 3. Category Setup
 
 ```bash
