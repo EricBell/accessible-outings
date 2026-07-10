@@ -70,12 +70,13 @@ migrations on top of that baseline.
 Then create the admin account:
 
 ```bash
-cd admin-tools
-uv run python create_admin_user.py
-
-# Verify admin setup is working
-uv run python verify_admin_setup.py
+uv run flask create-admin
 ```
+
+This prompts for username/email/password and creates a user with `is_admin=True` using the
+app's real `User` model and Werkzeug password hashing. Additional admins can be created the
+same way, or promoted from the web UI at `/admin/users` (see "User Management" below) once one
+admin account exists.
 
 ### 3. Category Setup
 
@@ -105,8 +106,7 @@ uv run python check_schema.py
 
 ### Must Run (in order):
 1. `uv run flask db upgrade` (or `flask db stamp 7298bca17ff7` for an existing database) - Creates/aligns all database tables and schema
-2. `admin-tools/create_admin_user.py` - Creates admin account
-3. `admin-tools/verify_admin_setup.py` - Verifies admin login works
+2. `uv run flask create-admin` - Creates admin account (prompts for username/email/password)
 
 ### Optional:
 - `admin-tools/reset_categories.py` - Reset venue categories to defaults
@@ -183,10 +183,11 @@ uv run python -c "from app import app; app.app_context().push(); from models imp
 
 ### Missing Admin User
 ```bash
-cd admin-tools
-uv run python clean_admin_setup.py
-uv run python create_admin_user.py
+uv run flask create-admin
 ```
+
+To manage existing users (promote/demote admin, reset password, delete), use the web UI at
+`/admin/users` once logged in as an admin.
 
 ### Schema Problems
 ```bash
@@ -202,7 +203,7 @@ uv run flask db upgrade
 
 ## Production Security
 
-1. **Change default admin password** after first login
+1. **Use strong, unique passwords** for all admin accounts created via `flask create-admin`
 2. **Use strong SECRET_KEY** (not the default)
 3. **Enable HTTPS** and set `SESSION_COOKIE_SECURE=True`
 4. **Restrict API keys** to your domain
@@ -221,10 +222,7 @@ uv run flask db upgrade
 **Quick Start Command Sequence:**
 ```bash
 uv run flask db upgrade  # or: flask db stamp 7298bca17ff7 for an existing database
-cd admin-tools
-uv run python create_admin_user.py
-uv run python verify_admin_setup.py
-cd ..
+uv run flask create-admin
 uv run python app.py
 ```
 

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-users-cog me-2"></i>User Management</h1>
+                <a href="{{ url_for('main.admin') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if users %}
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Admin</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                {% if user.is_admin %}
+                                <span class="badge bg-danger">Admin</span>
+                                {% else %}
+                                <span class="badge bg-secondary">User</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user.created_at.strftime('%m/%d/%Y') if user.created_at else '' }}</td>
+                            <td>
+                                {% if user.id == current_user.id %}
+                                <span class="text-muted small">This is you</span>
+                                {% else %}
+                                <div class="d-flex flex-wrap gap-1">
+                                    <form method="POST" action="{{ url_for('main.admin_toggle_admin', user_id=user.id) }}"
+                                          onsubmit="return confirm('{{ 'Remove admin access for' if user.is_admin else 'Grant admin access to' }} {{ user.username }}?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-warning">
+                                            {{ 'Demote' if user.is_admin else 'Promote' }}
+                                        </button>
+                                    </form>
+
+                                    <button type="button" class="btn btn-sm btn-outline-primary"
+                                            data-bs-toggle="collapse" data-bs-target="#reset-{{ user.id }}">
+                                        Reset Password
+                                    </button>
+
+                                    <form method="POST" action="{{ url_for('main.admin_delete_user', user_id=user.id) }}"
+                                          onsubmit="return confirm('Delete user {{ user.username }}? This cannot be undone.');">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                                <div class="collapse mt-2" id="reset-{{ user.id }}">
+                                    <form method="POST" action="{{ url_for('main.admin_reset_password', user_id=user.id) }}"
+                                          class="d-flex gap-2">
+                                        <input type="password" name="new_password" class="form-control form-control-sm"
+                                               placeholder="New password (min 6 chars)" minlength="6" required>
+                                        <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No users found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

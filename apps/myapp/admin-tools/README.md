@@ -3,15 +3,22 @@
 This folder contains scripts needed for administrative tasks and data management.
 
 ## User Management
-- `user_manager.py` - **Interactive user management tool (verify/change/delete users)**
-- `create_admin_user.py` - Create a new admin user account
-- `fix_admin_password.py` - Fix admin user password issues
-- `fix_admin_password_final.py` - Final admin password reset tool
-- `final_admin_fix.py` - Comprehensive admin user fixes
-- `clean_admin_setup.py` - Clean and reset admin setup
-- `verify_admin_setup.py` - Verify admin user configuration
-- `update_admin_password_direct.py` - Direct password update utility
-- `simple_password_fix.py` - Simple admin password reset
+
+Creating the first admin account and day-to-day user management (promote/demote admin, reset
+password, delete) are no longer done via scripts in this folder - see:
+- `uv run flask create-admin` (from `apps/myapp/`) - Create an admin account. Uses the real
+  `User` model and Werkzeug password hashing, and works against Postgres or SQLite.
+- `/admin/users` web UI - Promote/demote admin, reset passwords, and delete users once logged
+  in as an admin.
+
+The old `create_admin_user.py`, `fix_admin_password*.py`, `final_admin_fix.py`,
+`clean_admin_setup.py`, `verify_admin_setup.py`, and `update_admin_password_direct.py` scripts
+have been removed - they operated on a stale hardcoded SQLite path and (except `user_manager.py`)
+used a password hashing scheme incompatible with the app's real login.
+
+- `user_manager.py` - **Interactive CLI fallback for user management (verify/change/delete
+  users)**. Still uses correct Werkzeug hashing; kept for shell-access scenarios where the web
+  UI isn't convenient.
 
 ## Data Management
 - `create_sample_events.py` - Create sample event data for testing/demo
@@ -39,11 +46,6 @@ python script_name.py
 **Warning:** These scripts modify production data. Use with caution in production environments.
 
 ## Common Admin Tasks
-
-### Reset Admin Password
-```bash
-python fix_admin_password_final.py
-```
 
 ### Create Sample Data
 ```bash

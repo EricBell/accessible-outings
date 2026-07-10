@@ -568,3 +568,56 @@ def admin():
                          recent_reviews=recent_reviews,
                          category_stats=category_stats,
                          top_interesting_venues=top_interesting_venues)
+
+@main_bp.route('/admin/users')
+@admin_required
+def admin_users():
+    """Admin user management page."""
+    users = User.query.order_by(User.created_at.desc()).all()
+    return render_template('admin_users.html', users=users)
+
+@main_bp.route('/admin/users/<int:user_id>/toggle-admin', methods=['POST'])
+@admin_required
+def admin_toggle_admin(user_id):
+    """Promote or demote a user's admin status."""
+    user = User.query.get_or_404(user_id)
+    current = get_current_user()
+    if user.id == current.id:
+        flash("You can't change your own admin status.", 'error')
+        return redirect(url_for('main.admin_users'))
+
+    user.is_admin = not user.is_admin
+    db.session.commit()
+    flash(f"{user.username} is now {'an admin' if user.is_admin else 'a regular user'}.", 'success')
+    return redirect(url_for('main.admin_users'))
+
+@main_bp.route('/admin/users/<int:user_id>/reset-password', methods=['POST'])
+@admin_required
+def admin_reset_password(user_id):
+    """Reset a user's password to a value chosen by the admin."""
+    user = User.query.get_or_404(user_id)
+    new_password = request.form.get('new_password', '')
+    if len(new_password) < 6:
+        flash('New password must be at least 6 characters long.', 'error')
+        return redirect(url_for('main.admin_users'))
+
+    user.set_password(new_password)
+    db.session.commit()
+    flash(f"Password reset for {user.username}.", 'success')
+    return redirect(url_for('main.admin_users'))
+
+@main_bp.route('/admin/users/<int:user_id>/delete', methods=['POST'])
+@admin_required
+def admin_delete_user(user_id):
+    """Delete a user account."""
+    user = User.query.get_or_404(user_id)
+    current = get_current_user()
+    if user.id == current.id:
+        flash("You can't delete your own account from here.", 'error')
+        return redirect(url_for('main.admin_users'))
+
+    username = user.username
+    db.session.delete(user)
+    db.session.commit()
+    flash(f"Deleted user {username}.", 'info')
+    return redirect(url_for('main.admin_users'))

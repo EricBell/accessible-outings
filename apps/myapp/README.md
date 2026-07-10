@@ -133,7 +133,16 @@ DEFAULT_USER_ID=1
 4. Create credentials (API Key)
 5. Add the API key to your `.env` file
 
-### 6. Run the Application
+### 6. Create an Admin Account
+
+```bash
+uv run flask create-admin
+```
+
+Prompts for a username/email/password and creates a user with admin access. Additional admins
+can be promoted later from the web UI at `/admin/users` once you're logged in as one.
+
+### 7. Run the Application
 
 ```bash
 uv run python app.py

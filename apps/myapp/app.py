@@ -1,5 +1,6 @@
 import os
 import logging
+import click
 from flask import Flask, render_template, request, jsonify, flash, redirect, url_for
 from flask_login import login_required, current_user
 from flask_migrate import Migrate, upgrade as db_upgrade
@@ -186,6 +187,19 @@ def create_app(config_class=None):
             return f"{distance:.1f} miles" if distance else "Distance unknown"
         return ""
     
+    @app.cli.command('create-admin')
+    @click.option('--username', prompt=True)
+    @click.option('--email', prompt=True)
+    @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True)
+    def create_admin(username, email, password):
+        """Create an admin user."""
+        from models.user import User
+        try:
+            user = User.create_user(username=username, email=email, password=password, is_admin=True)
+            click.echo(f"Created admin user '{user.username}' (id={user.id}).")
+        except ValueError as e:
+            click.echo(f"Error: {e}", err=True)
+
     return app
 
 # Create the application instance
