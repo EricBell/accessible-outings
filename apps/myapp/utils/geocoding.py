@@ -91,8 +91,7 @@ class GeocodingService:
         cache_key = f"geocode_zip_{normalized_zip}"
         
         params = {
-            'address': normalized_zip,
-            'components': 'country:US'  # Limit to US addresses
+            'components': f'postal_code:{normalized_zip}|country:US'
         }
         
         data = self._make_request(params, cache_key)
