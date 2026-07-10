@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Data Freshness - {{ app_name }}{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1><i class="fas fa-clock me-2"></i>Data Freshness</h1>
+                <a href="{{ url_for('main.admin') }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overall Buckets -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h4 class="card-title">{{ overall.fresh }}</h4>
+                    <p class="card-text">Fresh (&lt; 7 days)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h4 class="card-title">{{ overall.aging }}</h4>
+                    <p class="card-text">Aging (7-30 days)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h4 class="card-title">{{ overall.stale }}</h4>
+                    <p class="card-text">Stale (30-90 days)</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <h4 class="card-title">{{ overall.very_stale }}</h4>
+                    <p class="card-text">Very Stale (90+ days)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Per-Category Breakdown -->
+        <div class="col-lg-7 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-list me-2"></i>By Category</h5>
+                </div>
+                <div class="card-body">
+                    {% if category_stats %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Total</th>
+                                    <th>Fresh</th>
+                                    <th>Aging</th>
+                                    <th>Stale</th>
+                                    <th>Very Stale</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in category_stats %}
+                                <tr>
+                                    <td>{{ row.name }}</td>
+                                    <td>{{ row.total }}</td>
+                                    <td>{{ row.fresh }}</td>
+                                    <td>{{ row.aging }}</td>
+                                    <td>{{ row.stale }}</td>
+                                    <td>{{ row.very_stale }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No categorized venues yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Stale Venues -->
+        <div class="col-lg-5 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Most Stale Venues</h5>
+                </div>
+                <div class="card-body">
+                    {% if most_stale %}
+                    <div class="list-group list-group-flush">
+                        {% for venue in most_stale %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ venue.name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ venue.city }}, {{ venue.state }}
+                                        {% if venue.category %}&middot; {{ venue.category.name }}{% endif %}
+                                    </small>
+                                </div>
+                                <small class="text-muted">{{ venue.last_updated.strftime('%m/%d/%Y') if venue.last_updated else 'Unknown' }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No venues yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

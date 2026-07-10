@@ -144,7 +144,8 @@ can be promoted later from the web UI at `/admin/users` once you're logged in as
 
 Once logged in as an admin, `/admin/seed` lets you proactively populate venue data for a ZIP
 code/region (e.g. before launching in a new area) instead of waiting for a real user search to
-trigger it.
+trigger it. `/admin/staleness` shows how old that venue data is getting, overall and per
+category, so you know when it's worth re-seeding a region.
 
 ### 7. Run the Application
 

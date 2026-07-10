@@ -80,7 +80,8 @@ admin account exists.
 
 Once logged in as an admin, `/admin/seed` proactively populates venue data for a ZIP
 code/region (one Google Places search per selected category) - useful for pre-seeding a new
-metro area before real users start searching it there.
+metro area before real users start searching it there. `/admin/staleness` shows how old venue
+data is getting, overall and per category, so you know when a region is worth re-seeding.
 
 ### 3. Category Setup
 

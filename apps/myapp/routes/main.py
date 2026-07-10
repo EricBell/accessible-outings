@@ -622,6 +622,43 @@ def admin_delete_user(user_id):
     flash(f"Deleted user {username}.", 'info')
     return redirect(url_for('main.admin_users'))
 
+@main_bp.route('/admin/staleness')
+@admin_required
+def admin_staleness():
+    """Admin dashboard showing venue data age/freshness."""
+    now = datetime.utcnow()
+    cutoff_7 = now - timedelta(days=7)
+    cutoff_30 = now - timedelta(days=30)
+    cutoff_90 = now - timedelta(days=90)
+
+    def bucket_counts(query):
+        return {
+            'fresh': query.filter(Venue.last_updated >= cutoff_7).count(),
+            'aging': query.filter(Venue.last_updated < cutoff_7, Venue.last_updated >= cutoff_30).count(),
+            'stale': query.filter(Venue.last_updated < cutoff_30, Venue.last_updated >= cutoff_90).count(),
+            'very_stale': query.filter(Venue.last_updated < cutoff_90).count(),
+        }
+
+    overall = bucket_counts(Venue.query)
+
+    categories = VenueCategory.query.order_by(VenueCategory.name).all()
+    category_stats = []
+    for category in categories:
+        total = category.get_venues_count()
+        if total > 0:
+            buckets = bucket_counts(category.venues)
+            buckets['name'] = category.name
+            buckets['total'] = total
+            category_stats.append(buckets)
+
+    most_stale = Venue.query.order_by(Venue.last_updated.asc()).limit(15).all()
+
+    return render_template('admin_staleness.html',
+                         overall=overall,
+                         category_stats=category_stats,
+                         most_stale=most_stale,
+                         total_venues=Venue.query.count())
+
 @main_bp.route('/admin/seed', methods=['GET', 'POST'])
 @admin_required
 def admin_seed():
