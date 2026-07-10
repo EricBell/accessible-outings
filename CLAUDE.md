@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Custom Commands
 
-**`prime app`** — Read `CLAUDE.md` and `OVERVIEW.md` to build full context on this application. OVERVIEW.md is the authoritative description of architecture, design decisions, feature inventory, and file map. Read individual source files on demand when a task requires it — use §11 of OVERVIEW.md to locate the right file.
+**`prime app`** — Read `CLAUDE.md` and `OVERVIEW.md` to build full context on this application. OVERVIEW.md is the authoritative description of architecture, design decisions, feature inventory, and file map. Read individual source files on demand when a task requires it — use §8 (Key Entry Points) of OVERVIEW.md to locate the right file.
 
 ## Version Management
 

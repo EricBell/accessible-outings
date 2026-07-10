@@ -2,11 +2,11 @@
 
 > A Flask web app that helps people who use wheelchairs (and their caregivers) find wheelchair-accessible indoor venues and events near a given ZIP code.
 
-## Purpose
+## 1. Purpose
 
 The app lets users search by ZIP code and radius for accessible venues (museums, aquariums, botanical gardens, shopping centers, etc.) and events happening at those venues. Every venue carries explicit accessibility attributes (ramp access, accessible restrooms, elevator access, etc.), and users can save favorites and leave accessibility-focused reviews. Venue data is sourced from Google's **Places API (New)**; an Eventbrite integration exists in the codebase but is currently disabled (see Notes & Gotchas). Admins have a dedicated dashboard for user management and for growing/monitoring venue data coverage.
 
-## Tech Stack
+## 2. Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -23,7 +23,7 @@ The app lets users search by ZIP code and radius for accessible venues (museums,
 | Deployment | `just deploy` — rsync to a VPS over SSH + remote restart script (runs `uv sync` + `flask db upgrade` on restart) |
 | Testing | pytest, pytest-flask |
 
-## Directory Structure
+## 3. Directory Structure
 
 ```
 .
@@ -63,7 +63,7 @@ The app lets users search by ZIP code and radius for accessible venues (museums,
     └── tests/                    # test_app.py, test_geocode.py
 ```
 
-## Architecture
+## 4. Architecture
 
 - **App factory pattern**: `app.py:create_app()` builds the Flask app, loads config via `config.get_config()` (driven by `FLASK_ENV`), initializes `db`, `migrate` (Flask-Migrate), and `login_manager`, registers three blueprints (`auth`, `main`, `api`), and attaches service objects (`app.google_api`, `app.venue_search_service`, `app.location_service`) directly to the Flask app instance for use in route handlers via `current_app`.
 - **Schema managed by Alembic**: on startup, `create_app()` runs `flask_migrate.upgrade()` against `migrations/` (guarded so `flask db init`/`migrate` can still import the app before that directory exists), then seeds 12 hardcoded venue categories if `VenueCategory` is empty. There's no more `db.create_all()` — the migration is the source of truth.
@@ -75,13 +75,13 @@ The app lets users search by ZIP code and radius for accessible venues (museums,
 - **Accessibility scoring**: `utils/accessibility.py`'s `AccessibilityFilter` computes a 0–1 accessibility score per venue from its boolean accessibility columns; exposed to templates via a custom Jinja filter (`accessibility_score`) registered in `app.py`.
 - **Events vs. venues**: Venues are places (from Google Places); Events are scheduled happenings tied to a venue (`Event.venue_id`). `EventAggregator` (`utils/event_aggregator.py`) is meant to sync events from external providers into the DB but currently only uses local data — see Gotchas.
 
-## Integrations
+## 5. Integrations
 
 - **Google Places API (New)** (`utils/google_places.py`, `GOOGLE_PLACES_API_KEY`) — venue search and details. Uses `places.googleapis.com/v1`, POST + JSON bodies, and a mandatory `X-Goog-FieldMask` header (migrated from the legacy `maps.googleapis.com/maps/api/place` GET-based API).
 - **Google Geocoding API** (`utils/geocoding.py`, same key) — ZIP code → lat/lon for search, using the `postal_code` components filter (fixed after a bug where free-text ZIP lookups occasionally resolved to the wrong region, e.g. Boston's `02101` resolving to Colorado).
 - **Eventbrite API** (`utils/event_integrations/eventbrite_provider.py`, `EVENTBRITE_API_KEY`) — implemented but **disabled** in `EventAggregator._initialize_providers()` because Eventbrite's v3 API no longer allows public search.
 
-## Database & Data Layer
+## 6. Database & Data Layer
 
 - Flask-SQLAlchemy models in `models/`: `User` (with `is_admin`), `Venue`, `VenueCategory`, `Event`, `EventFavorite`, `EventReview`, `UserReview`, `UserFavorite`, `SearchHistory`, `ApiCache`.
 - **Schema is managed by Alembic** (`migrations/`, Flask-Migrate) — `migrations/versions/7298bca17ff7_baseline_schema.py` is the baseline; `database/schema.sql` / `schema_sqlite.sql` are superseded historical snapshots, no longer executed by the app.
@@ -90,7 +90,7 @@ The app lets users search by ZIP code and radius for accessible venues (museums,
 - **Postgres 15+ gotcha**: `GRANT ALL PRIVILEGES ON DATABASE` no longer implies `CREATE` on the `public` schema. A separate `GRANT ALL ON SCHEMA public TO <user>;`, run while connected to the target database (not `postgres`), is required or `flask db upgrade` fails with `permission denied for schema public`. Documented in README.md/DEPLOYMENT.md.
 - Old ad hoc migration scripts in `admin-tools/` (`db_migration.py`, `update_events_schema.py`) are deprecated — they operate on a stale hardcoded SQLite path and predate Alembic adoption.
 
-## Connectivity & Configuration
+## 7. Connectivity & Configuration
 
 Key environment variables (loaded via `python-dotenv` in `config.py`):
 
@@ -109,7 +109,7 @@ Key environment variables (loaded via `python-dotenv` in `config.py`):
 
 Runs on port `5000` by default (`PORT` env var overrides). Deployment target and SSH details live in `config/myapp.toml`, driven by `justfile`'s `just deploy <target>` (rsyncs to `accessibleoutings@50.116.57.169:/home/accessibleoutings/public_html/flaskapp/` and runs `restart.sh` remotely, which now runs `uv sync --frozen --no-dev` before restarting).
 
-## Key Entry Points
+## 8. Key Entry Points
 
 - `apps/myapp/app.py` — application factory, Alembic upgrade-on-startup, `flask create-admin` CLI; start here.
 - `apps/myapp/config.py` — all environment-driven configuration.
@@ -119,7 +119,7 @@ Runs on port `5000` by default (`PORT` env var overrides). Deployment target and
 - `apps/myapp/utils/google_places.py` — external venue data fetching and caching (Places API New).
 - `apps/myapp/migrations/` — Alembic migration environment; `flask db upgrade`/`flask db migrate` operate here.
 
-## Notes & Gotchas
+## 9. Notes & Gotchas
 
 - **CSRF is disabled** in `config.py` (`WTF_CSRF_ENABLED = False`) with a comment "Disabled for development" — this applies to all configs including `ProductionConfig`, which does not override it. Admin/auth POST forms (including the newer `/admin/users/*` and `/admin/seed` routes) rely on plain `<form>` posts with no CSRF token, matching the rest of the app.
 - **Eventbrite integration is fully implemented but dormant** — `EventAggregator` never actually calls out to Eventbrite; only local DB events are served. Don't assume events shown are synced from a live external source.
